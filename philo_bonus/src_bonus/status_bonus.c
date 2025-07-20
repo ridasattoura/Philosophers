@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   status_bonus.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ader <ader@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: risattou <risattou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/20 08:35:00 by ader              #+#    #+#             */
-/*   Updated: 2025/07/20 08:53:40 by ader             ###   ########.fr       */
+/*   Created: 2025/07/20 13:10:50 by risattou          #+#    #+#             */
+/*   Updated: 2025/07/20 13:10:52 by risattou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/philo_bonus.h"
+#include "../includes_bonus/philo_bonus.h"
 
 int	check_if_dead(t_args *args)
 {

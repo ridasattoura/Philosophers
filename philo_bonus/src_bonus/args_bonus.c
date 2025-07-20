@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   args_bonus.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ader <ader@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: risattou <risattou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/20 08:10:00 by ader              #+#    #+#             */
-/*   Updated: 2025/07/20 12:26:55 by ader             ###   ########.fr       */
+/*   Created: 2025/07/20 13:09:19 by risattou          #+#    #+#             */
+/*   Updated: 2025/07/20 13:09:24 by risattou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/philo_bonus.h"
+#include "../includes_bonus/philo_bonus.h"
 
 int	is_valid_number(const char *str)
 {

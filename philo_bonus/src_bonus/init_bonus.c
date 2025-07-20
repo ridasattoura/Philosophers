@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   init_bonus.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ader <ader@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: risattou <risattou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 05:24:08 by risattou          #+#    #+#             */
-/*   Updated: 2025/07/20 12:55:19 by ader             ###   ########.fr       */
+/*   Updated: 2025/07/20 13:08:41 by risattou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/philo_bonus.h"
+#include "../includes_bonus/philo_bonus.h"
 
 static int	allocate_philo_arrays(t_args *args)
 {

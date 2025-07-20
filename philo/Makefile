@@ -7,13 +7,7 @@ RM = rm -f
 SRCDIR = src
 INCDIR = includes
 
-MANDATORY_SRCS = main.c \
-		  init.c \
-		  utils.c \
-		  routine.c \
-		  philo_routine.c \
-		  cleanup.c \
-		  args.c \
+MANDATORY_SRCS = main.c init.c utils.c routine.c philo_routine.c cleanup.c args.c \
 		  monitor.c
 
 MANDATORY_OBJ = $(addprefix $(SRCDIR)/, $(MANDATORY_SRCS:.c=.o))

@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   process_routine_bonus.c                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ader <ader@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: risattou <risattou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 08:00:00 by ader              #+#    #+#             */
-/*   Updated: 2025/07/20 08:53:33 by ader             ###   ########.fr       */
+/*   Updated: 2025/07/20 13:08:41 by risattou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/philo_bonus.h"
+#include "../includes_bonus/philo_bonus.h"
 
 void	philo_sleep(t_philo *philo)
 {

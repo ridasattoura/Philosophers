@@ -4,40 +4,30 @@ CC = cc
 CFLAGS = -Wall -Wextra -Werror -pthread #-fsanitize=thread
 RM = rm -f
 
-SRCDIR = src
-INCDIR = includes
+SRCDIR = src_bonus
+INCDIR = includes_bonus
 
-SOURCES = main_bonus.c \
-		  init_bonus.c \
-		  semaphore_bonus.c \
-		  status_bonus.c \
-		  utils_bonus.c \
-		  args_bonus.c \
-		  process_bonus.c \
-		  process_routine_bonus.c \
-		  process_monitor_bonus.c \
-		  monitor_bonus.c \
-		  cleanup_bonus.c
+BONUS_SRCS = main_bonus.c init_bonus.c semaphore_bonus.c status_bonus.c utils_bonus.c \
+		  args_bonus.c process_bonus.c process_routine_bonus.c process_monitor_bonus.c \
+		  monitor_bonus.c cleanup_bonus.c
 
-SRCS = $(addprefix $(SRCDIR)/, $(SOURCES))
-OBJS = $(addprefix $(SRCDIR)/, $(SOURCES:.c=.o))
+BONUS_OBJ = $(addprefix $(SRCDIR)/, $(BONUS_SRCS:.c=.o))
 
-HEADER = includes/philo_bonus.h
+HEADER_BONUS = includes_bonus/philo_bonus.h
 
-$(NAME): $(OBJS) 
-	$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
+$(NAME): $(BONUS_OBJ) 
+	$(CC) $(CFLAGS) $(BONUS_OBJ) -o $(NAME)
 
 all: $(NAME) 
 
-$(SRCDIR)/%.o: $(SRCDIR)/%.c $(HEADER)
+$(SRCDIR)/%.o: $(SRCDIR)/%.c $(HEADER_BONUS)
 	$(CC) $(CFLAGS) -I$(INCDIR) -c $< -o $@
 
 clean:
-	$(RM) $(OBJS) 
+	$(RM) $(BONUS_OBJ)
 
 fclean: clean
 	$(RM) $(NAME)
-
 
 re: fclean all
 
