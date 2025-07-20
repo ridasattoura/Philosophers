@@ -1,13 +1,11 @@
 NAME = philo_bonus
 
-
 CC = cc
 CFLAGS = -Wall -Wextra -Werror -pthread #-fsanitize=thread
 RM = rm -f
 
 SRCDIR = src
 INCDIR = includes
-OBJDIR = obj
 
 SOURCES = main_bonus.c \
 		  init_bonus.c \
@@ -22,23 +20,24 @@ SOURCES = main_bonus.c \
 		  cleanup_bonus.c
 
 SRCS = $(addprefix $(SRCDIR)/, $(SOURCES))
-OBJS = $(addprefix $(OBJDIR)/, $(SOURCES:.c=.o))
+OBJS = $(addprefix $(SRCDIR)/, $(SOURCES:.c=.o))
 
-all: $(NAME)
+HEADER = includes/philo_bonus.h
 
-$(NAME): $(OBJS)
+$(NAME): $(OBJS) 
 	$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
 
+all: $(NAME) 
 
-$(OBJDIR)/%.o: $(SRCDIR)/%.c
-	@mkdir -p $(OBJDIR)
+$(SRCDIR)/%.o: $(SRCDIR)/%.c $(HEADER)
 	$(CC) $(CFLAGS) -I$(INCDIR) -c $< -o $@
 
 clean:
-	$(RM) -r $(OBJDIR)
+	$(RM) $(OBJS) 
 
 fclean: clean
 	$(RM) $(NAME)
+
 
 re: fclean all
 

@@ -2,9 +2,10 @@ NAME = philo
 
 CC = cc
 CFLAGS = -Wall -Wextra -Werror -pthread #-fsanitize=thread
-
 RM = rm -f
 
+SRCDIR = src
+INCDIR = includes
 
 MANDATORY_SRCS = main.c \
 		  init.c \
@@ -15,25 +16,17 @@ MANDATORY_SRCS = main.c \
 		  args.c \
 		  monitor.c
 
-MANDATORY_OBJ = $(MANDATORY_SRCS:.c=.o)
+MANDATORY_OBJ = $(addprefix $(SRCDIR)/, $(MANDATORY_SRCS:.c=.o))
 
 HEADER_Mandatory = includes/philo.h
-
-
-LIBFT = libft/libft.a
-LIBFT_DIR = libft
-
-CC = cc 
-CFLAGS = -Wall -Wextra -Werror -pthread
-RM = rm -f
 
 $(NAME): $(MANDATORY_OBJ) 
 	$(CC) $(CFLAGS) $(MANDATORY_OBJ) -o $(NAME)
 
 all: $(NAME) 
 
-Mandatory/%.o: Mandatory/%.c $(HEADER_Mandatory)
-	$(CC) $(CFLAGS) -c $< -o $@
+$(SRCDIR)/%.o: $(SRCDIR)/%.c $(HEADER_Mandatory)
+	$(CC) $(CFLAGS) -I$(INCDIR) -c $< -o $@
 
 clean:
 	$(RM) $(MANDATORY_OBJ) 
