@@ -5,11 +5,8 @@ CFLAGS = -Wall -Wextra -Werror -pthread #-fsanitize=thread
 
 RM = rm -f
 
-SRCDIR = src
-INCDIR = includes
-OBJDIR = obj
 
-SOURCES = main.c \
+MANDATORY_SRCS = main.c \
 		  init.c \
 		  utils.c \
 		  routine.c \
@@ -18,23 +15,32 @@ SOURCES = main.c \
 		  args.c \
 		  monitor.c
 
-SRCS = $(addprefix $(SRCDIR)/, $(SOURCES))
-OBJS = $(addprefix $(OBJDIR)/, $(SOURCES:.c=.o))
+MANDATORY_OBJ = $(MANDATORY_SRCS:.c=.o)
 
-all: $(NAME)
+HEADER_Mandatory = includes/philo.h
 
-$(NAME): $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
 
-$(OBJDIR)/%.o: $(SRCDIR)/%.c
-	@mkdir -p $(OBJDIR)
-	$(CC) $(CFLAGS) -I$(INCDIR) -c $< -o $@
+LIBFT = libft/libft.a
+LIBFT_DIR = libft
+
+CC = cc 
+CFLAGS = -Wall -Wextra -Werror -pthread
+RM = rm -f
+
+$(NAME): $(MANDATORY_OBJ) 
+	$(CC) $(CFLAGS) $(MANDATORY_OBJ) -o $(NAME)
+
+all: $(NAME) 
+
+Mandatory/%.o: Mandatory/%.c $(HEADER_Mandatory)
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	$(RM) -r $(OBJDIR)
+	$(RM) $(MANDATORY_OBJ) 
 
 fclean: clean
 	$(RM) $(NAME)
+
 
 re: fclean all
 
