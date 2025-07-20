@@ -6,7 +6,7 @@ void	philo_eat(t_philo *philo)
 		return;
 	
 	sem_wait(philo->args->forks);
-	print_status(philo, FORK);
+	print_status(philo, "has taken a fork");
 	
 	if (check_if_dead(philo->args))
 	{
@@ -15,7 +15,7 @@ void	philo_eat(t_philo *philo)
 	}
 	
 	sem_wait(philo->args->forks);
-	print_status(philo, FORK);
+	print_status(philo, "has taken a fork");
 	
 	if (check_if_dead(philo->args))
 	{
@@ -24,7 +24,7 @@ void	philo_eat(t_philo *philo)
 		return;
 	}
 	
-	print_status(philo, EATING);
+	print_status(philo, "is eating");
 	
 	sem_wait(philo->args->meal_sem);
 	philo->last_meal = get_time_ms();
@@ -39,13 +39,13 @@ void	philo_eat(t_philo *philo)
 
 void	philo_sleep(t_philo *philo)
 {
-	print_status(philo, SLEEPING);
+	print_status(philo, "is sleeping");
 	ft_usleep(philo->args->time_to_sleep);
 }
 
 void	philo_think(t_philo *philo)
 {
-	print_status(philo, THINKING);
+	print_status(philo, "is thinking");
 }
 
 void	*death_monitor(void *arg)
@@ -70,7 +70,7 @@ void	*death_monitor(void *arg)
 			philo->args->someone_dead = 1;
 			sem_post(philo->args->stop_sem);
 			
-			print_status(philo, DIED);
+			print_status(philo, "died");
 			exit(1);
 		}
 		

@@ -8,12 +8,6 @@
 # include <sys/time.h>
 # include <string.h>
 
-# define FORK "has taken a fork"
-# define EATING "is eating"
-# define SLEEPING "is sleeping"
-# define THINKING "is thinking"
-# define DIED "died"
-
 typedef struct s_args
 {
     int				nb_of_philo;

@@ -13,18 +13,6 @@
 # include <fcntl.h>
 # include <sys/stat.h>
 
-# define FORK "has taken a fork"
-# define EATING "is eating"
-# define SLEEPING "is sleeping"
-# define THINKING "is thinking"
-# define DIED "died"
-
-# define SEM_FORKS		"/philo_forks"
-# define SEM_PRINT		"/philo_print"
-# define SEM_MEAL		"/philo_meal"
-# define SEM_STOP		"/philo_stop"
-# define SEM_FINISHED	"/philo_finished"
-
 typedef struct s_args	t_args;
 
 typedef struct s_philo

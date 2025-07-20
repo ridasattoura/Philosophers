@@ -2,11 +2,11 @@
 
 void	unlink_semaphores(void)
 {
-	sem_unlink(SEM_FORKS);
-	sem_unlink(SEM_PRINT);
-	sem_unlink(SEM_MEAL);
-	sem_unlink(SEM_STOP);
-	sem_unlink(SEM_FINISHED);
+	sem_unlink("/philo_forks");
+	sem_unlink("/philo_print");
+	sem_unlink("/philo_meal");
+	sem_unlink("/philo_stop");
+	sem_unlink("/philo_finished");
 }
 
 void	destroy_semaphores(t_args *args)

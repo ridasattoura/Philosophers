@@ -20,7 +20,7 @@ int	check_death(t_philo *philos)
 			{
 				philos[i].args->someone_dead = 1;
 				printf("%lld %d %s\n", current_time - philos[i].args->start_time, 
-					   philos[i].id, DIED);
+					   philos[i].id, "died");
 				fflush(stdout);
 			}
 			pthread_mutex_unlock(&philos[i].args->write_mutex);
@@ -66,14 +66,15 @@ int	check_meals(t_philo *philos)
 void	*monitoring(void *philo)
 {
 	t_philo	*philos;
+	t_args	*args;
 
 	philos = (t_philo *)philo;
-	
-		}
+	args = philos->args;
 	
 	ft_usleep(10);
 	
-	while (!is_simulation_over(args))	{
+	while (!check_if_dead(args))
+	{
 		if (check_death(philos))
 			break;
 		
