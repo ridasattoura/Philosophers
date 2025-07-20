@@ -6,7 +6,7 @@
 /*   By: ader <ader@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 05:24:08 by risattou          #+#    #+#             */
-/*   Updated: 2025/07/20 08:53:05 by ader             ###   ########.fr       */
+/*   Updated: 2025/07/20 12:55:19 by ader             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ static int	init_data_components(t_args *args)
 {
 	if (pthread_mutex_init(&args->pids_mutex, NULL))
 	{
-		perror("pthread_mutex_init");
+		printf("Error: Failed to initialize mutex\n");
 		return (1);
 	}
 	if (init_semaphores(args))

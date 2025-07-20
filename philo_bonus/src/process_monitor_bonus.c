@@ -6,7 +6,7 @@
 /*   By: ader <ader@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 08:40:00 by ader              #+#    #+#             */
-/*   Updated: 2025/07/20 08:53:27 by ader             ###   ########.fr       */
+/*   Updated: 2025/07/20 12:55:19 by ader             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ static int	check_process_status(t_args *args, int i, int *finished_count)
 	else if (wpid == -1)
 	{
 		pthread_mutex_unlock(&args->pids_mutex);
-		perror("waitpid");
+		printf("Error: waitpid failed\n");
 		return (1);
 	}
 	return (0);

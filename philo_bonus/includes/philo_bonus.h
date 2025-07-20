@@ -6,7 +6,7 @@
 /*   By: ader <ader@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 05:23:52 by risattou          #+#    #+#             */
-/*   Updated: 2025/07/20 08:18:17 by ader             ###   ########.fr       */
+/*   Updated: 2025/07/20 12:55:19 by ader             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,6 @@ typedef struct s_philo
 	pid_t			pid;
 	t_args			*args;
 }	t_philo;
-
 typedef struct s_args
 {
 	int				nb_of_philo;
