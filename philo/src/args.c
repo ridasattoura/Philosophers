@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   args.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: risattou <risattou@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ader <ader@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 13:09:50 by risattou          #+#    #+#             */
-/*   Updated: 2025/07/20 13:09:53 by risattou         ###   ########.fr       */
+/*   Updated: 2025/07/20 13:27:06 by ader             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,11 +76,6 @@ static int	validate_arguments(t_args *args, int argc)
 		|| (argc == 6 && args->nb_of_eat <= 0))
 	{
 		printf("Error: All arguments must be positive integers\n");
-		return (1);
-	}
-	if (args->nb_of_philo > 200)
-	{
-		printf("Error: Too many philosophers (max 200)\n");
 		return (1);
 	}
 	return (0);

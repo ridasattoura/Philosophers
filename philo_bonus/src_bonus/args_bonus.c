@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   args_bonus.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: risattou <risattou@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ader <ader@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 13:09:19 by risattou          #+#    #+#             */
-/*   Updated: 2025/07/20 13:09:24 by risattou         ###   ########.fr       */
+/*   Updated: 2025/07/20 13:27:06 by ader             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,22 +63,6 @@ static int	validate_argument_values(t_args *args, int argc)
 			&& args->nb_of_eat <= 0))
 	{
 		printf("Error: All arguments must be positive integers\n");
-		return (1);
-	}
-	if (args->nb_of_philo > 200)
-	{
-		printf("Error: Too many philosophers (max 200)\n");
-		return (1);
-	}
-	if (args->time_to_die > 60000 || args->time_to_eat > 60000
-		|| args->time_to_sleep > 60000)
-	{
-		printf("Error: Time values too large (max 60000ms)\n");
-		return (1);
-	}
-	if (argc == 6 && args->nb_of_eat > 10000)
-	{
-		printf("Error: Meal count too large (max 10000)\n");
 		return (1);
 	}
 	return (0);

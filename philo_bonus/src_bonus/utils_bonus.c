@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils_bonus.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: risattou <risattou@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ader <ader@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 05:24:25 by risattou          #+#    #+#             */
-/*   Updated: 2025/07/20 13:15:37 by risattou         ###   ########.fr       */
+/*   Updated: 2025/07/20 13:27:06 by ader             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,8 +44,8 @@ void	print_status(t_philo *philo, char *status)
 
 int	ft_atoi(const char *nptr)
 {
-	int					sign;
-	unsigned long long	total;
+	int		sign;
+	long	total;
 
 	sign = 1;
 	total = 0;
@@ -60,13 +60,11 @@ int	ft_atoi(const char *nptr)
 	while (*nptr >= '0' && *nptr <= '9')
 	{
 		total = total * 10 + (*nptr - '0');
-		if (total > 9223372036854775807 && sign == 1)
-		{
-			if (sign == 1)
-				return (-1);
-			return (0);
-		}
+		if (total > 2147483647 && sign == 1)
+			return (2147483647);
+		if (total > 2147483648 && sign == -1)
+			return (-2147483648);
 		nptr++;
 	}
-	return (total * sign);
+	return ((int)(total * sign));
 }
