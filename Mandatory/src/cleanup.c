@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cleanup.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: risattou <risattou@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ader <ader@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 05:24:37 by risattou          #+#    #+#             */
-/*   Updated: 2025/07/20 05:24:38 by risattou         ###   ########.fr       */
+/*   Updated: 2025/07/20 08:47:43 by ader             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,9 +26,15 @@ void	clean_simulation(t_args *args, t_philo *philos, pthread_mutex_t *forks)
 		}
 		free(forks);
 	}
-
-	pthread_mutex_destroy(&args->write_mutex);
-
 	if (philos)
+	{
+		i = 0;
+		while (i < args->nb_of_philo)
+		{
+			pthread_mutex_destroy(&philos[i].meal_mutex);
+			i++;
+		}
 		free(philos);
+	}
+	pthread_mutex_destroy(&args->write_mutex);
 }

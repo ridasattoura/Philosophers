@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   monitor_bonus.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: risattou <risattou@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ader <ader@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 05:24:15 by risattou          #+#    #+#             */
-/*   Updated: 2025/07/20 05:24:16 by risattou         ###   ########.fr       */
+/*   Updated: 2025/07/20 12:28:40 by ader             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philo_bonus.h"
+#include "../includes/philo_bonus.h"
 
 int	check_meals_completion(t_args *args)
 {
@@ -19,10 +19,8 @@ int	check_meals_completion(t_args *args)
 
 	if (args->nb_of_eat == -1)
 		return (0);
-	
 	i = 0;
 	total_meals_eaten = 0;
-	
 	sem_wait(args->meal_sem);
 	while (i < args->nb_of_philo)
 	{
@@ -31,7 +29,6 @@ int	check_meals_completion(t_args *args)
 		i++;
 	}
 	sem_post(args->meal_sem);
-	
 	if (total_meals_eaten >= args->nb_of_philo)
 	{
 		sem_wait(args->stop_sem);
@@ -39,7 +36,57 @@ int	check_meals_completion(t_args *args)
 		sem_post(args->stop_sem);
 		return (1);
 	}
-	
+	return (0);
+}
+
+static void	handle_process_death(t_args *args, pid_t dead_pid)
+{
+	int	i;
+
+	sem_wait(args->stop_sem);
+	args->someone_dead = 1;
+	sem_post(args->stop_sem);
+	pthread_mutex_lock(&args->pids_mutex);
+	i = 0;
+	while (i < args->nb_of_philo)
+	{
+		if (args->pids[i] > 0 && args->pids[i] != dead_pid)
+		{
+			kill(args->pids[i], SIGKILL);
+			args->pids[i] = -1;
+		}
+		i++;
+	}
+	pthread_mutex_unlock(&args->pids_mutex);
+}
+
+static int	handle_process_completion(t_args *args, int *finished_count)
+{
+	if (args->nb_of_eat == -1)
+		return (0);
+	if (*finished_count >= args->nb_of_philo)
+	{
+		sem_wait(args->stop_sem);
+		args->someone_dead = 1;
+		sem_post(args->stop_sem);
+		return (1);
+	}
+	return (0);
+}
+
+static int	process_child_status(t_args *args, pid_t wpid, int status,
+		int *finished_count)
+{
+	if (WIFEXITED(status) && WEXITSTATUS(status) == 1)
+	{
+		handle_process_death(args, wpid);
+		return (1);
+	}
+	else if (WIFEXITED(status) && WEXITSTATUS(status) == 0)
+	{
+		(*finished_count)++;
+		return (handle_process_completion(args, finished_count));
+	}
 	return (0);
 }
 
@@ -48,31 +95,22 @@ void	*monitor_routine(void *arg)
 	t_args	*args;
 	int		status;
 	pid_t	wpid;
+	int		finished_count;
 
 	args = (t_args *)arg;
-	
+	finished_count = 0;
 	ft_usleep(1);
-	
 	while (!check_if_dead(args))
 	{
 		wpid = waitpid(-1, &status, WNOHANG);
 		if (wpid > 0)
 		{
-			if (WIFEXITED(status) && WEXITSTATUS(status) == 1)
-			{
-				sem_wait(args->stop_sem);
-				args->someone_dead = 1;
-				sem_post(args->stop_sem);
-				break;
-			}
+			if (process_child_status(args, wpid, status, &finished_count))
+				break ;
 		}
-		else if (wpid == -1)
-		{
-			break;
-		}
-		
-		ft_usleep(10);
+		else if (wpid == -1 && finished_count > 0)
+			break ;
+		ft_usleep(1);
 	}
-	
 	return (NULL);
 }

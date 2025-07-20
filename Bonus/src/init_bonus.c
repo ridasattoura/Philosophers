@@ -3,83 +3,20 @@
 /*                                                        :::      ::::::::   */
 /*   init_bonus.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: risattou <risattou@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ader <ader@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 05:24:08 by risattou          #+#    #+#             */
-/*   Updated: 2025/07/20 05:24:09 by risattou         ###   ########.fr       */
+/*   Updated: 2025/07/20 08:53:05 by ader             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philo_bonus.h"
+#include "../includes/philo_bonus.h"
 
-int	init_semaphores(t_args *args)
+static int	allocate_philo_arrays(t_args *args)
 {
-	args->forks = sem_open("/philo_forks", O_CREAT | O_EXCL, 0644, args->nb_of_philo);
-	if (args->forks == SEM_FAILED)
-	{
-		perror("sem_open forks");
-		return (1);
-	}
-	
-	args->print_sem = sem_open("/philo_print", O_CREAT | O_EXCL, 0644, 1);
-	if (args->print_sem == SEM_FAILED)
-	{
-		perror("sem_open print");
-		sem_close(args->forks);
-		sem_unlink("/philo_forks");
-		return (1);
-	}
-	
-	args->meal_sem = sem_open("/philo_meal", O_CREAT | O_EXCL, 0644, 1);
-	if (args->meal_sem == SEM_FAILED)
-	{
-		perror("sem_open meal");
-		sem_close(args->forks);
-		sem_close(args->print_sem);
-		sem_unlink("/philo_forks");
-		sem_unlink("/philo_print");
-		return (1);
-	}
-	
-	args->stop_sem = sem_open("/philo_stop", O_CREAT | O_EXCL, 0644, 1);
-	if (args->stop_sem == SEM_FAILED)
-	{
-		perror("sem_open stop");
-		sem_close(args->forks);
-		sem_close(args->print_sem);
-		sem_close(args->meal_sem);
-		sem_unlink("/philo_forks");
-		sem_unlink("/philo_print");
-		sem_unlink("/philo_meal");
-		return (1);
-	}
-	
-	args->finished_sem = sem_open("/philo_finished", O_CREAT | O_EXCL, 0644, 1);
-	if (args->finished_sem == SEM_FAILED)
-	{
-		perror("sem_open finished");
-		sem_close(args->forks);
-		sem_close(args->print_sem);
-		sem_close(args->meal_sem);
-		sem_close(args->stop_sem);
-		sem_unlink("/philo_forks");
-		sem_unlink("/philo_print");
-		sem_unlink("/philo_meal");
-		sem_unlink("/philo_stop");
-		return (1);
-	}
-	
-	return (0);
-}
-
-int	init_philos(t_args *args)
-{
-	int	i;
-
 	args->philos = malloc(sizeof(t_philo) * args->nb_of_philo);
 	if (!args->philos)
 		return (1);
-	
 	args->pids = malloc(sizeof(pid_t) * args->nb_of_philo);
 	if (!args->pids)
 	{
@@ -87,7 +24,13 @@ int	init_philos(t_args *args)
 		args->philos = NULL;
 		return (1);
 	}
-	
+	return (0);
+}
+
+static void	initialize_philosopher_data(t_args *args)
+{
+	int	i;
+
 	i = 0;
 	while (i < args->nb_of_philo)
 	{
@@ -98,7 +41,33 @@ int	init_philos(t_args *args)
 		args->pids[i] = 0;
 		i++;
 	}
-	
+}
+
+int	init_philos(t_args *args)
+{
+	if (allocate_philo_arrays(args))
+		return (1);
+	initialize_philosopher_data(args);
+	return (0);
+}
+
+static int	init_data_components(t_args *args)
+{
+	if (pthread_mutex_init(&args->pids_mutex, NULL))
+	{
+		perror("pthread_mutex_init");
+		return (1);
+	}
+	if (init_semaphores(args))
+	{
+		pthread_mutex_destroy(&args->pids_mutex);
+		return (1);
+	}
+	if (init_philos(args))
+	{
+		pthread_mutex_destroy(&args->pids_mutex);
+		return (1);
+	}
 	return (0);
 }
 
@@ -114,12 +83,5 @@ int	init_data(t_args *args)
 	args->finished_sem = NULL;
 	args->philos = NULL;
 	args->pids = NULL;
-	
-	if (init_semaphores(args))
-		return (1);
-	
-	if (init_philos(args))
-		return (1);
-	
-	return (0);
+	return (init_data_components(args));
 }

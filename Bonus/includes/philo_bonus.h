@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo_bonus.h                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: risattou <risattou@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ader <ader@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 05:23:52 by risattou          #+#    #+#             */
-/*   Updated: 2025/07/20 05:23:53 by risattou         ###   ########.fr       */
+/*   Updated: 2025/07/20 08:18:17 by ader             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,7 @@ typedef struct s_args
 	sem_t			*meal_sem;
 	sem_t			*stop_sem;
 	sem_t			*finished_sem;
+	pthread_mutex_t	pids_mutex;
 	t_philo			*philos;
 	pid_t			*pids;
 }	t_args;
@@ -59,6 +60,7 @@ int			main(int argc, char **argv);
 int			parse_arguments(int argc, char **argv, t_args *args);
 int			is_valid_number(const char *str);
 void		kill_all_processes(t_args *args);
+int			wait_for_processes(t_args *args);
 
 int			init_data(t_args *args);
 int			init_philos(t_args *args);
@@ -74,6 +76,8 @@ void		philosopher_process(t_philo *philo);
 void		philo_eat(t_philo *philo);
 void		philo_sleep(t_philo *philo);
 void		philo_think(t_philo *philo);
+void		*death_monitor(void *arg);
+void		single_philosopher_process(t_philo *philo);
 
 void		*monitor_routine(void *arg);
 int			check_death(t_args *args);

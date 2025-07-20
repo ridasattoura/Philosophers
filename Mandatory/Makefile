@@ -1,7 +1,8 @@
 NAME = philo
 
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -pthread
+CFLAGS = -Wall -Wextra -Werror -pthread #-fsanitize=thread
+
 RM = rm -f
 
 SRCDIR = src
@@ -12,8 +13,10 @@ SOURCES = main.c \
 		  init.c \
 		  utils.c \
 		  routine.c \
-		  monitor.c \
-		  cleanup.c
+		  philo_routine.c \
+		  cleanup.c \
+		  args.c \
+		  monitor.c
 
 SRCS = $(addprefix $(SRCDIR)/, $(SOURCES))
 OBJS = $(addprefix $(OBJDIR)/, $(SOURCES:.c=.o))

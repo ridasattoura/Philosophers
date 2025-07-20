@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: risattou <risattou@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ader <ader@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 05:24:44 by risattou          #+#    #+#             */
-/*   Updated: 2025/07/20 05:24:45 by risattou         ###   ########.fr       */
+/*   Updated: 2025/07/20 08:26:05 by ader             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,10 +18,11 @@ int	check_args(int ac, char **av)
 
 	if (ac < 5 || ac > 6)
 	{
-		printf("Usage: %s number_of_philosophers time_to_die time_to_eat time_to_sleep [number_of_times_each_philosopher_must_eat]\n", av[0]);
+		printf("Usage: %s number_of_philosophers time_to_die ", av[0]);
+		printf("time_to_eat time_to_sleep ");
+		printf("[number_of_times_each_philosopher_must_eat]\n");
 		return (1);
 	}
-	
 	i = 1;
 	while (i < ac)
 	{
@@ -32,48 +33,31 @@ int	check_args(int ac, char **av)
 		}
 		i++;
 	}
-	
 	return (0);
 }
 
-int	check_if_dead(t_args *args)
+static int	create_threads(t_philo *philos, t_args *args)
 {
-	pthread_mutex_lock(&args->write_mutex);
-	if (args->someone_dead)
-	{
-		pthread_mutex_unlock(&args->write_mutex);
-		return (1);
-	}
-	pthread_mutex_unlock(&args->write_mutex);
-	return (0);
-}
+	int	i;
 
-int	simulation(t_args *args)
-{
-	t_philo			*philos;
-	pthread_mutex_t	*forks;
-	int				i;
-
-	if (init_philo(&philos, args, &forks) != 0)
-		return (1);
-	
 	i = 0;
 	while (i < args->nb_of_philo)
 	{
-		if (pthread_create(&philos[i].thread, NULL, &start_routine, &philos[i]) != 0)
-		{
-			clean_simulation(args, philos, forks);
+		if (pthread_create(&philos[i].thread, NULL,
+				&start_routine, &philos[i]) != 0)
 			return (1);
-		}
 		i++;
 	}
-	
-	if (pthread_create(&args->monitoring_thread, NULL, &monitoring, philos) != 0)
-	{
-		clean_simulation(args, philos, forks);
+	if (pthread_create(&args->monitoring_thread, NULL,
+			&monitoring, philos) != 0)
 		return (1);
-	}
-	
+	return (0);
+}
+
+static void	join_threads(t_philo *philos, t_args *args)
+{
+	int	i;
+
 	i = 0;
 	while (i < args->nb_of_philo)
 	{
@@ -81,7 +65,21 @@ int	simulation(t_args *args)
 		i++;
 	}
 	pthread_join(args->monitoring_thread, NULL);
-	
+}
+
+int	simulation(t_args *args)
+{
+	t_philo			*philos;
+	pthread_mutex_t	*forks;
+
+	if (init_philo(&philos, args, &forks) != 0)
+		return (1);
+	if (create_threads(philos, args) != 0)
+	{
+		clean_simulation(args, philos, forks);
+		return (1);
+	}
+	join_threads(philos, args);
 	clean_simulation(args, philos, forks);
 	return (0);
 }
@@ -92,9 +90,7 @@ int	main(int argc, char **argv)
 
 	if (check_args(argc, argv) != 0)
 		return (1);
-	
 	if (parse_arguments(argc, argv, &args) != 0)
 		return (1);
-	
 	return (simulation(&args));
 }
