@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo_routine.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: risattou <risattou@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ader <ader@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 10:00:00 by ader              #+#    #+#             */
-/*   Updated: 2025/07/20 13:10:17 by risattou         ###   ########.fr       */
+/*   Updated: 2025/07/29 11:03:11 by ader             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,39 +14,23 @@
 
 static int	calculate_think_time(t_philo *ph)
 {
-	int	cycle_time;
-	int	max_safe_think;
-	int	safe_think_time;
-
-	cycle_time = ph->args->time_to_eat + ph->args->time_to_sleep;
-	safe_think_time = 0;
-	if (ph->args->nb_of_philo % 2 == 1 && ph->args->nb_of_philo > 3)
-	{
-		max_safe_think = ph->args->time_to_die - cycle_time - 50;
-		if (max_safe_think > 0)
-		{
-			safe_think_time = ph->args->time_to_eat / 2;
-			if (safe_think_time > max_safe_think)
-				safe_think_time = max_safe_think;
-		}
-	}
-	return (safe_think_time);
+	if (ph->args->nb_of_philo % 2 == 1)
+		return (ph->args->time_to_eat / 2);
+	return (0);
 }
 
 void	*start_routine(void *philo)
 {
 	t_philo	*ph;
-	int		think_time;
 
 	ph = (t_philo *)philo;
 	if (ph->id % 2 == 0)
-		ft_usleep(ph->args->time_to_eat / 2);
+		ft_usleep(calculate_think_time(ph));
 	while (!check_if_dead(ph->args))
 	{
 		print_status(ph, "is thinking");
-		think_time = calculate_think_time(ph);
-		if (think_time > 0)
-			ft_usleep(think_time);
+		if (ph->args->nb_of_philo % 2 == 1)
+			ft_usleep(1);
 		eat_and_sleep(ph);
 		if (ph->args->nb_of_eat != -1 && ph->nb_eat >= ph->args->nb_of_eat)
 			break ;

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: risattou <risattou@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ader <ader@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 05:24:52 by risattou          #+#    #+#             */
-/*   Updated: 2025/07/20 13:10:23 by risattou         ###   ########.fr       */
+/*   Updated: 2025/07/20 15:38:46 by ader             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,6 @@ void	print_status(t_philo *philo, char *status)
 	{
 		timestamp = get_time_ms() - philo->args->start_time;
 		printf("%lld %d %s\n", timestamp, philo->id, status);
-		fflush(stdout);
 	}
 	pthread_mutex_unlock(&philo->args->write_mutex);
 }

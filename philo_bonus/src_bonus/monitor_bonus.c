@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   monitor_bonus.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: risattou <risattou@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ader <ader@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 05:24:15 by risattou          #+#    #+#             */
-/*   Updated: 2025/07/20 13:08:41 by risattou         ###   ########.fr       */
+/*   Updated: 2025/07/20 15:33:12 by ader             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ static void	handle_process_death(t_args *args, pid_t dead_pid)
 	sem_wait(args->stop_sem);
 	args->someone_dead = 1;
 	sem_post(args->stop_sem);
-	pthread_mutex_lock(&args->pids_mutex);
+	sem_wait(args->pids_sem);
 	i = 0;
 	while (i < args->nb_of_philo)
 	{
@@ -57,7 +57,7 @@ static void	handle_process_death(t_args *args, pid_t dead_pid)
 		}
 		i++;
 	}
-	pthread_mutex_unlock(&args->pids_mutex);
+	sem_post(args->pids_sem);
 }
 
 static int	handle_process_completion(t_args *args, int *finished_count)

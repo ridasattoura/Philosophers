@@ -1,33 +1,27 @@
 NAME = philo
 
+SRCS = src/main.c src/init.c src/utils.c src/routine.c src/philo_routine.c \
+		src/cleanup.c src/args.c src/monitor.c
+
+SRCOB = $(SRCS:.c=.o)
+HEADER = includes/philo.h
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -pthread #-fsanitize=thread
+CFLAGS = -Wall -Wextra -Werror -pthread
 RM = rm -f
 
-SRCDIR = src
-INCDIR = includes
+$(NAME): $(SRCOB)
+	$(CC) $(CFLAGS) $(SRCOB) -o $(NAME)
 
-MANDATORY_SRCS = main.c init.c utils.c routine.c philo_routine.c cleanup.c args.c \
-		  monitor.c
+all: $(NAME)
 
-MANDATORY_OBJ = $(addprefix $(SRCDIR)/, $(MANDATORY_SRCS:.c=.o))
-
-HEADER_Mandatory = includes/philo.h
-
-$(NAME): $(MANDATORY_OBJ) 
-	$(CC) $(CFLAGS) $(MANDATORY_OBJ) -o $(NAME)
-
-all: $(NAME) 
-
-$(SRCDIR)/%.o: $(SRCDIR)/%.c $(HEADER_Mandatory)
-	$(CC) $(CFLAGS) -I$(INCDIR) -c $< -o $@
+%.o: %.c $(HEADER)
+	$(CC) $(CFLAGS) -Iincludes -c $< -o $@
 
 clean:
-	$(RM) $(MANDATORY_OBJ) 
+	$(RM) $(SRCOB)
 
 fclean: clean
 	$(RM) $(NAME)
-
 
 re: fclean all
 

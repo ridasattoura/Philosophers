@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   routine.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: risattou <risattou@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ader <ader@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 05:24:50 by risattou          #+#    #+#             */
-/*   Updated: 2025/07/20 13:10:20 by risattou         ###   ########.fr       */
+/*   Updated: 2025/07/23 15:24:44 by ader             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,30 +20,32 @@ static void	handle_single_philo(t_philo *philo)
 	pthread_mutex_unlock(philo->left_fork);
 }
 
-static void	take_forks_even(t_philo *philo)
+static int	take_forks_even(t_philo *philo)
 {
 	pthread_mutex_lock(philo->left_fork);
 	print_status(philo, "has taken a fork");
 	if (check_if_dead(philo->args))
 	{
 		pthread_mutex_unlock(philo->left_fork);
-		return ;
+		return (0);
 	}
 	pthread_mutex_lock(philo->right_fork);
 	print_status(philo, "has taken a fork");
+	return (1);
 }
 
-static void	take_forks_odd(t_philo *philo)
+static int	take_forks_odd(t_philo *philo)
 {
 	pthread_mutex_lock(philo->right_fork);
 	print_status(philo, "has taken a fork");
 	if (check_if_dead(philo->args))
 	{
 		pthread_mutex_unlock(philo->right_fork);
-		return ;
+		return (0);
 	}
 	pthread_mutex_lock(philo->left_fork);
 	print_status(philo, "has taken a fork");
+	return (1);
 }
 
 static void	eat_process(t_philo *philo)
@@ -62,6 +64,8 @@ static void	eat_process(t_philo *philo)
 
 void	eat_and_sleep(t_philo *philo)
 {
+	int	got_forks;
+
 	if (check_if_dead(philo->args))
 		return ;
 	if (philo->args->nb_of_philo == 1)
@@ -70,14 +74,9 @@ void	eat_and_sleep(t_philo *philo)
 		return ;
 	}
 	if (philo->id % 2 == 0)
-		take_forks_even(philo);
+		got_forks = take_forks_even(philo);
 	else
-		take_forks_odd(philo);
-	if (check_if_dead(philo->args))
-	{
-		pthread_mutex_unlock(philo->left_fork);
-		pthread_mutex_unlock(philo->right_fork);
-		return ;
-	}
-	eat_process(philo);
+		got_forks = take_forks_odd(philo);
+	if (got_forks && !check_if_dead(philo->args))
+		eat_process(philo);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cleanup_bonus.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: risattou <risattou@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ader <ader@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 05:24:02 by risattou          #+#    #+#             */
-/*   Updated: 2025/07/20 13:08:41 by risattou         ###   ########.fr       */
+/*   Updated: 2025/07/20 15:33:12 by ader             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@ void	unlink_semaphores(void)
 	sem_unlink("/philo_meal");
 	sem_unlink("/philo_stop");
 	sem_unlink("/philo_finished");
+	sem_unlink("/philo_pids_sem");
 }
 
 void	destroy_semaphores(t_args *args)
@@ -39,7 +40,11 @@ void	destroy_semaphores(t_args *args)
 void	cleanup_data(t_args *args)
 {
 	destroy_semaphores(args);
-	pthread_mutex_destroy(&args->pids_mutex);
+	if (args->pids_sem)
+	{
+		sem_close(args->pids_sem);
+		sem_unlink("/philo_pids_sem");
+	}
 	if (args->philos)
 	{
 		free(args->philos);

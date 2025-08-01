@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init_bonus.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: risattou <risattou@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ader <ader@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 05:24:08 by risattou          #+#    #+#             */
-/*   Updated: 2025/07/20 13:08:41 by risattou         ###   ########.fr       */
+/*   Updated: 2025/07/29 10:49:35 by ader             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,19 +53,22 @@ int	init_philos(t_args *args)
 
 static int	init_data_components(t_args *args)
 {
-	if (pthread_mutex_init(&args->pids_mutex, NULL))
+	args->pids_sem = sem_open("/philo_pids_sem", O_CREAT | O_EXCL, 0644, 1);
+	if (args->pids_sem == SEM_FAILED)
 	{
-		printf("Error: Failed to initialize mutex\n");
+		printf("Error: Failed to initialize PIDs semaphore\n");
 		return (1);
 	}
 	if (init_semaphores(args))
 	{
-		pthread_mutex_destroy(&args->pids_mutex);
+		sem_close(args->pids_sem);
+		sem_unlink("/philo_pids_sem");
 		return (1);
 	}
 	if (init_philos(args))
 	{
-		pthread_mutex_destroy(&args->pids_mutex);
+		sem_close(args->pids_sem);
+		sem_unlink("/philo_pids_sem");
 		return (1);
 	}
 	return (0);

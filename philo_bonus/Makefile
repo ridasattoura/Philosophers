@@ -1,30 +1,26 @@
 NAME = philo_bonus
 
+SRCS = src_bonus/main_bonus.c src_bonus/init_bonus.c src_bonus/semaphore_bonus.c \
+		src_bonus/status_bonus.c src_bonus/utils_bonus.c src_bonus/args_bonus.c \
+		src_bonus/process_bonus.c src_bonus/process_routine_bonus.c \
+		src_bonus/monitor_bonus.c src_bonus/cleanup_bonus.c
+
+SRCOB = $(SRCS:.c=.o)
+HEADER = includes_bonus/philo_bonus.h
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -pthread #-fsanitize=thread
+CFLAGS = -Wall -Wextra -Werror -pthread
 RM = rm -f
 
-SRCDIR = src_bonus
-INCDIR = includes_bonus
+$(NAME): $(SRCOB)
+	$(CC) $(CFLAGS) $(SRCOB) -o $(NAME)
 
-BONUS_SRCS = main_bonus.c init_bonus.c semaphore_bonus.c status_bonus.c utils_bonus.c \
-		  args_bonus.c process_bonus.c process_routine_bonus.c process_monitor_bonus.c \
-		  monitor_bonus.c cleanup_bonus.c
+all: $(NAME)
 
-BONUS_OBJ = $(addprefix $(SRCDIR)/, $(BONUS_SRCS:.c=.o))
-
-HEADER_BONUS = includes_bonus/philo_bonus.h
-
-$(NAME): $(BONUS_OBJ) 
-	$(CC) $(CFLAGS) $(BONUS_OBJ) -o $(NAME)
-
-all: $(NAME) 
-
-$(SRCDIR)/%.o: $(SRCDIR)/%.c $(HEADER_BONUS)
-	$(CC) $(CFLAGS) -I$(INCDIR) -c $< -o $@
+%.o: %.c $(HEADER)
+	$(CC) $(CFLAGS) -Iincludes_bonus -c $< -o $@
 
 clean:
-	$(RM) $(BONUS_OBJ)
+	$(RM) $(SRCOB)
 
 fclean: clean
 	$(RM) $(NAME)

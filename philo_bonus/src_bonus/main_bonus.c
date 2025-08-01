@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main_bonus.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: risattou <risattou@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ader <ader@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 05:24:12 by risattou          #+#    #+#             */
-/*   Updated: 2025/07/20 13:08:41 by risattou         ###   ########.fr       */
+/*   Updated: 2025/07/23 15:20:00 by ader             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,15 +16,40 @@ void	kill_all_processes(t_args *args)
 {
 	int	i;
 
-	pthread_mutex_lock(&args->pids_mutex);
+	sem_wait(args->pids_sem);
 	i = 0;
 	while (i < args->nb_of_philo)
 	{
 		if (args->pids[i] > 0)
+		{
 			kill(args->pids[i], SIGKILL);
+			args->pids[i] = -1;
+		}
 		i++;
 	}
-	pthread_mutex_unlock(&args->pids_mutex);
+	sem_post(args->pids_sem);
+}
+
+static int	create_child_process(t_args *args, int i)
+{
+	pid_t	pid;
+
+	pid = fork();
+	if (pid == -1)
+	{
+		printf("Error: Failed to create process for philosopher %d\n", i + 1);
+		kill_all_processes(args);
+		return (1);
+	}
+	if (pid == 0)
+	{
+		philosopher_process(&args->philos[i]);
+		exit(0);
+	}
+	sem_wait(args->pids_sem);
+	args->pids[i] = pid;
+	sem_post(args->pids_sem);
+	return (0);
 }
 
 static int	create_philosophers(t_args *args)
@@ -34,19 +59,8 @@ static int	create_philosophers(t_args *args)
 	i = 0;
 	while (i < args->nb_of_philo)
 	{
-		args->pids[i] = fork();
-		if (args->pids[i] == 0)
-		{
-			philosopher_process(&args->philos[i]);
-			exit(0);
-		}
-		else if (args->pids[i] < 0)
-		{
-			printf("Error: Failed to create philosopher process\n");
-			kill_all_processes(args);
-			cleanup_data(args);
+		if (create_child_process(args, i))
 			return (1);
-		}
 		i++;
 	}
 	return (0);

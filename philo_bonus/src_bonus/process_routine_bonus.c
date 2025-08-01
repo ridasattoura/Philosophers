@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   process_routine_bonus.c                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: risattou <risattou@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ader <ader@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 08:00:00 by ader              #+#    #+#             */
-/*   Updated: 2025/07/20 13:08:41 by risattou         ###   ########.fr       */
+/*   Updated: 2025/07/23 15:12:15 by ader             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,15 @@ void	philo_sleep(t_philo *philo)
 
 void	philo_think(t_philo *philo)
 {
+	int	think_time;
+
 	print_status(philo, "is thinking");
+	if (philo->args->nb_of_philo % 2 == 1 && philo->args->nb_of_philo > 3)
+	{
+		think_time = philo->args->time_to_eat / 2;
+		if (think_time > 0)
+			ft_usleep(think_time);
+	}
 }
 
 void	*death_monitor(void *arg)
@@ -41,7 +49,6 @@ void	*death_monitor(void *arg)
 			sem_wait(philo->args->print_sem);
 			printf("%lld %d died\n", current_time - philo->args->start_time,
 				philo->id);
-			fflush(stdout);
 			exit(1);
 		}
 		ft_usleep(1);

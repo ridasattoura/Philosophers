@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   process_bonus.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: risattou <risattou@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ader <ader@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 05:24:22 by risattou          #+#    #+#             */
-/*   Updated: 2025/07/20 13:08:41 by risattou         ###   ########.fr       */
+/*   Updated: 2025/07/23 15:12:15 by ader             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ static int	handle_finished_eating(t_philo *philo)
 static int	init_philosopher_process(t_philo *philo, pthread_t *death_thread)
 {
 	if (philo->id % 2 == 0)
-		ft_usleep(10);
+		ft_usleep(philo->args->time_to_eat / 2);
 	sem_wait(philo->args->meal_sem);
 	philo->last_meal = get_time_ms();
 	sem_post(philo->args->meal_sem);
@@ -75,9 +75,7 @@ static void	run_philosopher_loop(t_philo *philo)
 	while (!check_if_dead(philo->args))
 	{
 		philo_eat(philo);
-		if (check_if_dead(philo->args))
-			break ;
-		if (handle_finished_eating(philo))
+		if (check_if_dead(philo->args) || handle_finished_eating(philo))
 			break ;
 		philo_sleep(philo);
 		if (check_if_dead(philo->args))

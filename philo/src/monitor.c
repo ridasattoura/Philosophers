@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   monitor.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: risattou <risattou@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ader <ader@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 05:24:47 by risattou          #+#    #+#             */
-/*   Updated: 2025/07/20 13:10:14 by risattou         ###   ########.fr       */
+/*   Updated: 2025/07/20 15:38:46 by ader             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,6 @@ static void	announce_death(t_philo *philo, long long current_time)
 		philo->args->someone_dead = 1;
 		printf("%lld %d died\n", current_time - philo->args->start_time,
 			philo->id);
-		fflush(stdout);
 	}
 	pthread_mutex_unlock(&philo->args->write_mutex);
 }
