@@ -20,53 +20,61 @@ void	samone_died(t_dining_table *table, int i)
 	pthread_mutex_unlock(&table->check_mutex);
 }
 
-void	monitor_philosophers(t_dining_table *table)
+void	check_philosopher_death(t_dining_table *table)
 {
 	int	i;
 	int	dead;
-	int	satisfied;
 
-	while (1)
+	i = -1;
+	dead = 0;
+	pthread_mutex_lock(&table->check_mutex);
+	dead = table->someone_died;
+	pthread_mutex_unlock(&table->check_mutex);
+	while (!dead && ++i < table->philo_count)
 	{
-		i = -1;
 		pthread_mutex_lock(&table->check_mutex);
-		dead = table->someone_died;
-		pthread_mutex_unlock(&table->check_mutex);
-		while (!dead && ++i < table->philo_count)
+		if (get_current_time() - table->philosophers[i].last_meal_time > (size_t)table->time_to_die)
 		{
-			pthread_mutex_lock(&table->check_mutex);
-			if (get_current_time() - table->philosophers[i].last_meal_time 
-				> (size_t)table->time_to_die)
-			{
-				table->someone_died = 1;
-				dead = 1;
-				pthread_mutex_unlock(&table->check_mutex);
-				print_status(&table->philosophers[i], DIED);
-			}
-			else
-			{
-				dead = table->someone_died;
-				pthread_mutex_unlock(&table->check_mutex);
-			}
-			usleep(100);
-		}
-		if (dead)
-			break ;
-		i = 0;
-		pthread_mutex_lock(&table->check_mutex);
-		while (table->max_meals != -1 && i < table->philo_count
-			&& table->philosophers[i].meals_eaten >= table->max_meals)
-			i++;
-		if (i == table->philo_count && table->max_meals != -1)
-		{
-			table->all_satisfied = 1;
-			satisfied = table->all_satisfied;
+			table->someone_died = 1;
+			dead = 1;
+			pthread_mutex_unlock(&table->check_mutex);
+			print_status(&table->philosophers[i], DIED);
 		}
 		else
-			satisfied = table->all_satisfied;
-		pthread_mutex_unlock(&table->check_mutex);
-		if (satisfied)
-			break ;
+		{
+			dead = table->someone_died;
+			pthread_mutex_unlock(&table->check_mutex);
+		}
+		usleep(100);
+	}
+}
+
+int	check_all_satisfied(t_dining_table *table)
+{
+	int	i;
+
+	i = 0;
+	pthread_mutex_lock(&table->check_mutex);
+	while (table->max_meals != -1 && i < table->philo_count
+		&& table->philosophers[i].meals_eaten >= table->max_meals)
+		i++;
+	if (i == table->philo_count && table->max_meals != -1)
+	{
+		table->all_satisfied = 1;
+	}
+	pthread_mutex_unlock(&table->check_mutex);
+	return table->all_satisfied;
+}
+
+void	monitor_philosophers(t_dining_table *table)
+{
+	while (1)
+	{
+		check_philosopher_death(table);
+		if (table->someone_died)
+			break;
+		if (check_all_satisfied(table))
+			break;
 	}
 }
 
