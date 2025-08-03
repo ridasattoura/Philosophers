@@ -24,7 +24,9 @@ static void	philosopher_eats(t_philosopher *philo)
 		precise_sleep(table, table->time_to_die);
 		print_status(philo, DIED);
 		pthread_mutex_unlock(&philo->fork);
+		pthread_mutex_lock(&table->check_mutex);
 		table->someone_died = 1;
+		pthread_mutex_unlock(&table->check_mutex);
 		return ;
 	}
 	pthread_mutex_lock(&philo->next->fork);
@@ -43,13 +45,23 @@ void	*philosopher_routine(void *arg)
 {
 	t_philosopher	*philo;
 	t_dining_table	*table;
+	int				dead;
+	int				satisfied;
 
 	philo = (t_philosopher *)arg;
 	table = philo->table;
 	if (philo->id % 2 == 0)
 		usleep(1000);
-	while (!table->someone_died && !table->all_satisfied)
+	while (1)
 	{
+		pthread_mutex_lock(&table->check_mutex);
+		dead = table->someone_died;
+		satisfied = table->all_satisfied;
+		pthread_mutex_unlock(&table->check_mutex);
+		
+		if (dead || satisfied)
+			break;
+			
 		philosopher_eats(philo);
 		print_status(philo, IS_SLEEPING);
 		precise_sleep(table, table->time_to_sleep);

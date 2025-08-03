@@ -15,33 +15,61 @@
 void	samone_died(t_dining_table *table, int i)
 {
 	print_status(&table->philosophers[i], DIED);
+	pthread_mutex_lock(&table->check_mutex);
 	table->someone_died = 1;
+	pthread_mutex_unlock(&table->check_mutex);
 }
 
 void	monitor_philosophers(t_dining_table *table)
 {
 	int	i;
+	int	dead;
+	int	satisfied;
 
-	while (!table->all_satisfied)
+	while (1)
 	{
 		i = -1;
-		while (!table->someone_died && ++i < table->philo_count)
+		pthread_mutex_lock(&table->check_mutex);
+		dead = table->someone_died;
+		pthread_mutex_unlock(&table->check_mutex);
+		
+		while (!dead && ++i < table->philo_count)
 		{
 			pthread_mutex_lock(&table->check_mutex);
 			if (get_current_time() - table->philosophers[i].last_meal_time 
 				> (size_t)table->time_to_die)
-				samone_died(table, i);
-			pthread_mutex_unlock(&table->check_mutex);
+			{
+				table->someone_died = 1;
+				dead = 1;
+				pthread_mutex_unlock(&table->check_mutex);
+				print_status(&table->philosophers[i], DIED);
+			}
+			else
+			{
+				dead = table->someone_died;
+				pthread_mutex_unlock(&table->check_mutex);
+			}
 			usleep(100);
 		}
-		if (table->someone_died)
+		if (dead)
 			break ;
 		i = 0;
+		pthread_mutex_lock(&table->check_mutex);
 		while (table->max_meals != -1 && i < table->philo_count
 			&& table->philosophers[i].meals_eaten >= table->max_meals)
 			i++;
-		if (i == table->philo_count)
+		if (i == table->philo_count && table->max_meals != -1)
+		{
 			table->all_satisfied = 1;
+			satisfied = table->all_satisfied;
+		}
+		else
+		{
+			satisfied = table->all_satisfied;
+		}
+		pthread_mutex_unlock(&table->check_mutex);
+		if (satisfied)
+			break;
 	}
 }
 
@@ -72,11 +100,16 @@ size_t	get_current_time(void)
 void	precise_sleep(t_dining_table *table, size_t duration)
 {
 	size_t	start_time;
+	int		dead;
 
 	start_time = get_current_time();
-	while (!(table->someone_died))
+	while (1)
 	{
-		if (get_current_time() - start_time >= duration)
+		pthread_mutex_lock(&table->check_mutex);
+		dead = table->someone_died;
+		pthread_mutex_unlock(&table->check_mutex);
+		
+		if (dead || get_current_time() - start_time >= duration)
 			break ;
 		usleep(100);
 	}
