@@ -22,28 +22,50 @@ static void	handle_single_philo(t_philo *philo)
 
 static int	take_forks_even(t_philo *philo)
 {
+	long long	start_time;
+	
+	start_time = get_time_ms();
 	pthread_mutex_lock(philo->left_fork);
 	print_status(philo, "has taken a fork");
-	if (check_if_dead(philo->args))
+	if (check_if_dead(philo->args) || 
+		(get_time_ms() - start_time) > (philo->args->time_to_die / 3))
 	{
 		pthread_mutex_unlock(philo->left_fork);
 		return (0);
 	}
 	pthread_mutex_lock(philo->right_fork);
+	if (check_if_dead(philo->args) || 
+		(get_time_ms() - start_time) > (philo->args->time_to_die / 3))
+	{
+		pthread_mutex_unlock(philo->right_fork);
+		pthread_mutex_unlock(philo->left_fork);
+		return (0);
+	}
 	print_status(philo, "has taken a fork");
 	return (1);
 }
 
 static int	take_forks_odd(t_philo *philo)
 {
+	long long	start_time;
+	
+	start_time = get_time_ms();
 	pthread_mutex_lock(philo->right_fork);
 	print_status(philo, "has taken a fork");
-	if (check_if_dead(philo->args))
+	if (check_if_dead(philo->args) || 
+		(get_time_ms() - start_time) > (philo->args->time_to_die / 3))
 	{
 		pthread_mutex_unlock(philo->right_fork);
 		return (0);
 	}
 	pthread_mutex_lock(philo->left_fork);
+	if (check_if_dead(philo->args) || 
+		(get_time_ms() - start_time) > (philo->args->time_to_die / 3))
+	{
+		pthread_mutex_unlock(philo->left_fork);
+		pthread_mutex_unlock(philo->right_fork);
+		return (0);
+	}
 	print_status(philo, "has taken a fork");
 	return (1);
 }
@@ -65,6 +87,7 @@ static void	eat_process(t_philo *philo)
 void	eat_and_sleep(t_philo *philo)
 {
 	int	got_forks;
+	int	retry_count;
 
 	if (check_if_dead(philo->args))
 		return ;
@@ -73,10 +96,23 @@ void	eat_and_sleep(t_philo *philo)
 		handle_single_philo(philo);
 		return ;
 	}
-	if (philo->id % 2 == 0)
-		got_forks = take_forks_even(philo);
-	else
-		got_forks = take_forks_odd(philo);
+	
+	retry_count = 0;
+	got_forks = 0;
+	while (!got_forks && retry_count < 2 && !check_if_dead(philo->args))
+	{
+		if (philo->id % 2 == 0)
+			got_forks = take_forks_even(philo);
+		else
+			got_forks = take_forks_odd(philo);
+		
+		if (!got_forks)
+		{
+			retry_count++;
+			ft_usleep(1); // Minimal backoff for tight deadlines
+		}
+	}
+	
 	if (got_forks && !check_if_dead(philo->args))
 		eat_process(philo);
 }

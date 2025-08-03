@@ -14,9 +14,21 @@
 
 static int	calculate_think_time(t_philo *ph)
 {
+	int	base_time;
+	int	adaptive_time;
+	
 	if (ph->args->nb_of_philo % 2 == 1)
-		return (ph->args->time_to_eat / 2);
-	return (0);
+		base_time = ph->args->time_to_eat / 2;
+	else
+		base_time = 0;
+	
+	// Add adaptive thinking time based on philosopher count
+	if (ph->args->nb_of_philo > 5)
+	{
+		adaptive_time = (ph->args->time_to_eat * ph->args->nb_of_philo) / 20;
+		return (base_time + adaptive_time);
+	}
+	return (base_time);
 }
 
 void	*start_routine(void *philo)
