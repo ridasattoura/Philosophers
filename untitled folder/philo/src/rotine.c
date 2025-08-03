@@ -6,11 +6,36 @@
 /*   By: risattou <risattou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/03 02:27:30 by risattou          #+#    #+#             */
-/*   Updated: 2025/08/03 06:07:55 by risattou         ###   ########.fr       */
+/*   Updated: 2025/08/03 06:29:03 by risattou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+
+void	precise_sleep(t_dining_table *table, size_t duration)
+{
+	size_t	start_time;
+	int		dead;
+
+	start_time = get_current_time();
+	while (1)
+	{
+		pthread_mutex_lock(&table->check_mutex);
+		dead = table->someone_died;
+		pthread_mutex_unlock(&table->check_mutex);
+		if (dead || get_current_time() - start_time >= duration)
+			break ;
+		usleep(100);
+	}
+}
+
+size_t	get_current_time(void)
+{
+	struct timeval	t;
+
+	gettimeofday(&t, NULL);
+	return ((t.tv_sec * 1000) + (t.tv_usec / 1000));
+}
 
 static void	philosopher_eats(t_philosopher *philo)
 {

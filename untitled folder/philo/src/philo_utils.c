@@ -6,7 +6,7 @@
 /*   By: risattou <risattou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/03 02:27:24 by risattou          #+#    #+#             */
-/*   Updated: 2025/08/03 06:08:57 by risattou         ###   ########.fr       */
+/*   Updated: 2025/08/03 06:30:35 by risattou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,39 +20,31 @@ void	samone_died(t_dining_table *table, int i)
 	pthread_mutex_unlock(&table->check_mutex);
 }
 
-void	check_philosopher_death(t_dining_table *table)
+void	check_philosopher_death(t_dining_table *table, int i, int *dead)
 {
-	int	i;
-	int	dead;
-
-	i = -1;
-	dead = 0;
 	pthread_mutex_lock(&table->check_mutex);
-	dead = table->someone_died;
-	pthread_mutex_unlock(&table->check_mutex);
-	while (!dead && ++i < table->philo_count)
+	if (get_current_time() - table->philosophers[i].last_meal_time 
+		> (size_t)table->time_to_die)
 	{
-		pthread_mutex_lock(&table->check_mutex);
-		if (get_current_time() - table->philosophers[i].last_meal_time > (size_t)table->time_to_die)
-		{
-			table->someone_died = 1;
-			dead = 1;
-			pthread_mutex_unlock(&table->check_mutex);
-			print_status(&table->philosophers[i], DIED);
-		}
-		else
-		{
-			dead = table->someone_died;
-			pthread_mutex_unlock(&table->check_mutex);
-		}
-		usleep(100);
+		table->someone_died = 1;
+		*dead = 1;
+		pthread_mutex_unlock(&table->check_mutex);
+		print_status(&table->philosophers[i], DIED);
 	}
+	else
+	{
+		*dead = table->someone_died;
+		pthread_mutex_unlock(&table->check_mutex);
+	}
+	usleep(100);
 }
 
 int	check_all_satisfied(t_dining_table *table)
 {
 	int	i;
+	int	satisfied;
 
+	satisfied = 0;
 	i = 0;
 	pthread_mutex_lock(&table->check_mutex);
 	while (table->max_meals != -1 && i < table->philo_count
@@ -61,20 +53,33 @@ int	check_all_satisfied(t_dining_table *table)
 	if (i == table->philo_count && table->max_meals != -1)
 	{
 		table->all_satisfied = 1;
+		satisfied = table->all_satisfied;
 	}
+	else
+		satisfied = table->all_satisfied;
 	pthread_mutex_unlock(&table->check_mutex);
-	return table->all_satisfied;
+	return (satisfied);
 }
 
 void	monitor_philosophers(t_dining_table *table)
 {
+	int	i;
+	int	dead;
+	int	satisfied;
+
 	while (1)
 	{
-		check_philosopher_death(table);
-		if (table->someone_died)
-			break;
-		if (check_all_satisfied(table))
-			break;
+		i = -1;
+		pthread_mutex_lock(&table->check_mutex);
+		dead = table->someone_died;
+		pthread_mutex_unlock(&table->check_mutex);
+		while (!dead && ++i < table->philo_count)
+			check_philosopher_death(table, i, &dead);
+		if (dead)
+			break ;
+		satisfied = check_all_satisfied(table);
+		if (satisfied)
+			break ;
 	}
 }
 
@@ -92,29 +97,4 @@ void	cleanup_and_exit(t_dining_table *table, pthread_t *thread_ids)
 	pthread_mutex_destroy(&table->check_mutex);
 	free(table->philosophers);
 	free(thread_ids);
-}
-
-size_t	get_current_time(void)
-{
-	struct timeval	t;
-
-	gettimeofday(&t, NULL);
-	return ((t.tv_sec * 1000) + (t.tv_usec / 1000));
-}
-
-void	precise_sleep(t_dining_table *table, size_t duration)
-{
-	size_t	start_time;
-	int		dead;
-
-	start_time = get_current_time();
-	while (1)
-	{
-		pthread_mutex_lock(&table->check_mutex);
-		dead = table->someone_died;
-		pthread_mutex_unlock(&table->check_mutex);
-		if (dead || get_current_time() - start_time >= duration)
-			break ;
-		usleep(100);
-	}
 }
