@@ -1,12 +1,12 @@
 NAME = philo_bonus
 
-SRCS = src/main_bonus.c src/validate_args_bonus.c src/utils_bonus.c src/put_mssg_bonus.c \
+SRCS = src/main_bonus.c src/validate_args_bonus_bonus.c src/utils_bonus.c src/put_mssg_bonus.c \
 		src/rotine_bonus.c src/philo_utils_bonus.c
 
 SRCOB = $(SRCS:.c=.o)
 HEADER = includes/philo_bonus.h
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -pthread
+CFLAGS = -Wall -Wextra -Werror -pthread -fsanitize=thread
 RM = rm -f
 
 $(NAME): $(SRCOB)
@@ -14,7 +14,7 @@ $(NAME): $(SRCOB)
 
 all: $(NAME)
 
-%.o: %_bonus.c $(HEADER)
+%.o: %.c $(HEADER)
 	$(CC) $(CFLAGS) -Iincludes -c $< -o $@
 
 clean:

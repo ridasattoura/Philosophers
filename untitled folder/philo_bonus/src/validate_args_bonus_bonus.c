@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   valider_args.c                                     :+:      :+:    :+:   */
+/*   validate_args_bonus_bonus.c                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: risattou <risattou@student.42.fr>          +#+  +:+       +#+        */
+/*   By: user <user@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/03 02:36:07 by risattou          #+#    #+#             */
-/*   Updated: 2025/08/03 02:36:08 by risattou         ###   ########.fr       */
+/*   Created: 2025/08/03 02:36:07 by user              #+#    #+#             */
+/*   Updated: 2025/08/03 02:36:08 by user             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <philo_bonus.h>
+#include "philo_bonus.h"
 
 static int	check_numeric_args(int argc, char *argv[])
 {
@@ -36,7 +36,7 @@ static int	check_numeric_args(int argc, char *argv[])
 	return (0);
 }
 
-static int	verifier_entier(char *s)
+static int	check_integer_overflow(char *s)
 {
 	size_t	len;
 
@@ -54,64 +54,63 @@ static int	verifier_entier(char *s)
 	return (0);
 }
 
-static void	initialisation(t_table *tab)
+static void	init_philosophers(t_table *table)
 {
 	int	i;
 
-	tab->mort = 0;
-	tab->satiete = 0;
-	tab->philos = (t_philo *)malloc(tab->nombre_de_philos * sizeof(t_philo));
+	table->someone_died = 0;
+	table->all_satisfied = 0;
+	table->philos = (t_philo *)malloc(table->nb_philos * sizeof(t_philo));
 	i = -1;
-	while (++i < tab->nombre_de_philos)
+	while (++i < table->nb_philos)
 	{
-		tab->philos[i].identifiant = i + 1;
-		tab->philos[i].tab = tab;
-		tab->philos[i].nombre_manger = 0;
-		if (i + 1 == tab->nombre_de_philos)
-			tab->philos[i].suivant = &tab->philos[0];
+		table->philos[i].id = i + 1;
+		table->philos[i].table = table;
+		table->philos[i].meals_eaten = 0;
+		if (i + 1 == table->nb_philos)
+			table->philos[i].next = &table->philos[0];
 		else
-			tab->philos[i].suivant = &tab->philos[i + 1];
+			table->philos[i].next = &table->philos[i + 1];
 		if (i == 0)
-			tab->philos[i].precedent = &tab->philos[tab->nombre_de_philos - 1];
+			table->philos[i].prev = &table->philos[table->nb_philos - 1];
 		else
-			tab->philos[i].precedent = &tab->philos[i - 1];
+			table->philos[i].prev = &table->philos[i - 1];
 	}
 }
 
-static void	initialisation_sem(t_table *tab)
+static void	init_semaphores(t_table *table)
 {
-	tab->afficher = sem_open("/sem_afficher", O_CREAT, 0644, 1);
-	tab->verifier = sem_open("/sem_verifier", O_CREAT, 0644, 1);
-	tab->fourchette = sem_open("/sem_fourchette", O_CREAT, 0644,
-			tab->nombre_de_philos);
-	if (tab->afficher == SEM_FAILED || tab->verifier == SEM_FAILED
-		|| tab->fourchette == SEM_FAILED)
+	table->print_sem = sem_open("/sem_print", O_CREAT, 0644, 1);
+	table->check_sem = sem_open("/sem_check", O_CREAT, 0644, 1);
+	table->forks_sem = sem_open("/sem_forks", O_CREAT, 0644, table->nb_philos);
+	if (table->print_sem == SEM_FAILED || table->check_sem == SEM_FAILED
+		|| table->forks_sem == SEM_FAILED)
 	{
 		write(2, "Error! sem_open failed\n", 23);
 		exit(1);
 	}
 }
 
-int	verifier_args(int argc, char *argv[], t_table *tab)
+int	validate_args(int argc, char *argv[], t_table *table)
 {
 	int	i;
 
-	if (verifier_nombres(argc, argv))
+	if (check_numeric_args(argc, argv))
 		return (1);
 	i = 0;
 	while (++i < argc)
 	{
-		if (verifier_entier(argv[i]))
+		if (check_integer_overflow(argv[i]))
 			return (1);
 	}
-	tab->nombre_de_philos = ft_atoi(argv[1]);
-	tab->temps_de_famine = ft_atoi(argv[2]);
-	tab->temps_de_manger = ft_atoi(argv[3]);
-	tab->temps_de_sommeil = ft_atoi(argv[4]);
-	tab->nombre_de_repas = -1;
+	table->nb_philos = ft_atoi(argv[1]);
+	table->time_to_die = ft_atoi(argv[2]);
+	table->time_to_eat = ft_atoi(argv[3]);
+	table->time_to_sleep = ft_atoi(argv[4]);
+	table->nb_meals = -1;
 	if (argc == 6)
-		tab->nombre_de_repas = ft_atoi(argv[5]);
-	initialisation(tab);
-	initialisation_sem(tab);
+		table->nb_meals = ft_atoi(argv[5]);
+	init_philosophers(table);
+	init_semaphores(table);
 	return (0);
 }

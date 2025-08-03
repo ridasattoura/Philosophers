@@ -33,47 +33,45 @@ enum						e_action_type
 	DIED
 };
 
-typedef struct s_philosopher
+typedef struct s_philo
 {
 	int						id;
 	int						meals_eaten;
-	size_t					last_meal_time;
-	struct s_philosopher	*next;
-	struct s_philosopher	*prev;
-	struct s_dining_table	*table;
+	long					last_meal_time;
+	struct s_philo			*next;
+	struct s_philo			*prev;
+	struct s_table			*table;
 	pid_t					process_id;
-	pthread_t				death_monitor;
-}							t_philosopher;
+}							t_philo;
 
-typedef struct s_dining_table
+typedef struct s_table
 {
 	int						time_to_die;
 	int						time_to_eat;
 	int						time_to_sleep;
-	int						max_meals;
-	int						philo_count;
+	int						nb_meals;
+	int						nb_philos;
 	int						all_satisfied;
 	int						someone_died;
-	size_t					start_time;
-	t_philosopher			*philosophers;
+	long					start_time;
+	t_philo					*philos;
 	sem_t					*print_sem;
 	sem_t					*check_sem;
-	sem_t					*fork_sem;
-}							t_dining_table;
+	sem_t					*forks_sem;
+}							t_table;
 
 int							ft_isdigit(int c);
 size_t						ft_strlen(const char *s);
 int							ft_strncmp(const char *s1, const char *s2,
 								size_t n);
 int							ft_atoi(const char *str);
-int							validate_arguments(int argc, char *argv[],
-								t_dining_table *table);
-void						print_status(t_philosopher *philo, int action);
+int							validate_args(int argc, char *argv[],
+								t_table *table);
+void						print_status(t_philo *philo, int action);
 void						*philosopher_routine(void *arg);
-void						cleanup_and_exit(t_dining_table *table);
-size_t						get_current_time(void);
-void						precise_sleep(t_dining_table *table,
-								size_t duration);
-void						*monitor_death(void *arg);
+void						cleanup_and_exit(t_table *table);
+long						get_current_time(void);
+void						precise_sleep(t_table *table, long time_ms);
+int							monitor_death(t_table *table);
 
 #endif

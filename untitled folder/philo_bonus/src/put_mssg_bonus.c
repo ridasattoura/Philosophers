@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <philo_bonus.h>
+#include "philo_bonus.h"
 
 static char	*get_action_message(int action)
 {
@@ -27,12 +27,13 @@ static char	*get_action_message(int action)
 	return ("Error: not valid action id");
 }
 
-void	print_status(t_philosopher *philo, int action)
+void	print_status(t_philo *philo, int action)
 {
-	size_t	elapsed_time;
+	long	elapsed_time;
 
 	elapsed_time = get_current_time() - philo->table->start_time;
 	sem_wait(philo->table->print_sem);
+	sem_wait(philo->table->check_sem);
 	if (!philo->table->someone_died && !philo->table->all_satisfied)
 	{
 		printf("%ld ", elapsed_time);
@@ -40,5 +41,6 @@ void	print_status(t_philosopher *philo, int action)
 		printf("%s", get_action_message(action));
 		printf("\n");
 	}
+	sem_post(philo->table->check_sem);
 	sem_post(philo->table->print_sem);
 }

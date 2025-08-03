@@ -6,7 +6,7 @@ SRCS = src/main.c src/init.c src/utils.c src/routine.c src/philo_routine.c \
 SRCOB = $(SRCS:.c=.o)
 HEADER = includes/philo.h
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -pthread
+CFLAGS = -Wall -Wextra -Werror -pthread -fsanitize=thread
 RM = rm -f
 
 $(NAME): $(SRCOB)

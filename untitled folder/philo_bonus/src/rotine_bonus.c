@@ -1,63 +1,70 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   rotine.c                                           :+:      :+:    :+:   */
+/*   rotine_bonus.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: risattou <risattou@student.42.fr>          +#+  +:+       +#+        */
+/*   By: user <user@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/03 02:36:01 by risattou          #+#    #+#             */
-/*   Updated: 2025/08/03 02:36:02 by risattou         ###   ########.fr       */
+/*   Created: 2025/08/03 02:35:55 by user              #+#    #+#             */
+/*   Updated: 2025/08/03 02:35:56 by user             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <philo_bonus.h>
+#include "philo_bonus.h"
 
-static void	philosopher_eats(t_philosopher *philo)
+static void	philosopher_eats(t_philo *philo)
 {
-	t_dining_table	*table;
+	t_table	*table;
 
 	table = philo->table;
-	sem_wait(philo->table->fork_sem);
+	sem_wait(table->forks_sem);
 	print_status(philo, TOOK_FORK);
-	if (philo->table->philo_count == 1)
+	if (table->nb_philos == 1)
 	{
 		precise_sleep(table, table->time_to_die);
 		print_status(philo, DIED);
+		sem_wait(table->check_sem);
 		table->someone_died = 1;
+		sem_post(table->check_sem);
 		return ;
 	}
-	sem_wait(philo->table->fork_sem);
+	sem_wait(table->forks_sem);
 	print_status(philo, TOOK_FORK);
-	sem_wait(philo->table->check_sem);
-	philo->meals_eaten++;
 	print_status(philo, IS_EATING);
+	sem_wait(table->check_sem);
 	philo->last_meal_time = get_current_time();
-	sem_post(philo->table->check_sem);
+	philo->meals_eaten++;
+	sem_post(table->check_sem);
 	precise_sleep(table, table->time_to_eat);
-	sem_post(philo->table->fork_sem);
-	sem_post(philo->table->fork_sem);
+	sem_post(table->forks_sem);
+	sem_post(table->forks_sem);
 }
 
 void	*philosopher_routine(void *arg)
 {
-	t_philosopher	*philo;
-	t_dining_table	*table;
+	t_philo	*philo;
+	t_table	*table;
 
-	philo = (t_philosopher *)arg;
+	philo = (t_philo *)arg;
 	table = philo->table;
 	philo->last_meal_time = table->start_time;
-	pthread_create(&philo->death_monitor, NULL, monitor_death, (void *)philo);
 	if (philo->id % 2 == 0)
-		usleep(1000);
-	while (!table->someone_died)
+		precise_sleep(table, 10);
+	while (1)
 	{
+		sem_wait(table->check_sem);
+		if (table->someone_died)
+		{
+			sem_post(table->check_sem);
+			break ;
+		}
+		sem_post(table->check_sem);
 		philosopher_eats(philo);
-		if (table->max_meals != -1 && philo->meals_eaten >= table->max_meals)
+		if (table->nb_meals != -1 && philo->meals_eaten >= table->nb_meals)
 			break ;
 		print_status(philo, IS_SLEEPING);
 		precise_sleep(table, table->time_to_sleep);
 		print_status(philo, IS_THINKING);
 	}
-	pthread_join(philo->death_monitor, NULL);
-	exit (0);
+	return (NULL);
 }
