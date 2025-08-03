@@ -1,4 +1,16 @@
-#include "../include/philo.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   valider_args.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: risattou <risattou@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/03 02:27:35 by risattou          #+#    #+#             */
+/*   Updated: 2025/08/03 02:34:51 by risattou         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "philo.h"
 
 static int	check_numeric_args(int argc, char *argv[])
 {
@@ -63,7 +75,8 @@ static void	initialize_simulation(t_dining_table *table)
 
 	table->someone_died = 0;
 	table->all_satisfied = 0;
-	table->philosophers = (t_philosopher *)malloc(table->philo_count * sizeof(t_philosopher));
+	table->philosophers = (t_philosopher *)malloc(table->philo_count
+			* sizeof(t_philosopher));
 	i = -1;
 	while (++i < table->philo_count)
 	{
@@ -75,7 +88,8 @@ static void	initialize_simulation(t_dining_table *table)
 		else
 			table->philosophers[i].next = &table->philosophers[i + 1];
 		if (i == 0)
-			table->philosophers[i].prev = &table->philosophers[table->philo_count - 1];
+			table->philosophers[i].prev 
+				= &table->philosophers[table->philo_count - 1];
 		else
 			table->philosophers[i].prev = &table->philosophers[i - 1];
 		pthread_mutex_init(&table->philosophers[i].fork, NULL);

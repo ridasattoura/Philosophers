@@ -1,6 +1,6 @@
 NAME = philo
 
-SRCS = src/main.c src/valider_args.c src/utils.c src/put_mssg.c \
+SRCS = src/main.c src/validate_args.c src/utils.c src/put_mssg.c \
 		src/rotine.c src/philo_utils.c
 
 SRCOB = $(SRCS:.c=.o)

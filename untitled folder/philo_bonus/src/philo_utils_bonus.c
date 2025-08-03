@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   philo_utils.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: risattou <risattou@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/03 02:35:55 by risattou          #+#    #+#             */
+/*   Updated: 2025/08/03 02:35:56 by risattou         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <philo_bonus.h>
 
 void	*verifier_la_mort(void *arg)
@@ -10,17 +22,19 @@ void	*verifier_la_mort(void *arg)
 	while (1)
 	{
 		sem_wait(tab->verifier);
-		if (temps_actuel() - philo->dernier_repas > (size_t)tab->temps_de_famine)
+		if (temps_actuel()
+			- philo->dernier_repas > (size_t)tab->temps_de_famine)
 		{
 			afficher_message(philo, MESSAGE_MORT);
 			tab->mort = 1;
-			exit (1);
+			exit(1);
 		}
 		sem_post(tab->verifier);
 		if (tab->mort)
 			break ;
 		usleep(1000);
-		if (tab->nombre_de_repas != -1 && philo->nombre_manger >= tab->nombre_de_repas)
+		if (tab->nombre_de_repas != -1
+			&& philo->nombre_manger >= tab->nombre_de_repas)
 			break ;
 	}
 	return (NULL);

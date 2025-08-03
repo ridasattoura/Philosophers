@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   valider_args.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: risattou <risattou@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/03 02:36:07 by risattou          #+#    #+#             */
+/*   Updated: 2025/08/03 02:36:08 by risattou         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <philo_bonus.h>
 
 static int	check_numeric_args(int argc, char *argv[])
@@ -70,7 +82,8 @@ static void	initialisation_sem(t_table *tab)
 {
 	tab->afficher = sem_open("/sem_afficher", O_CREAT, 0644, 1);
 	tab->verifier = sem_open("/sem_verifier", O_CREAT, 0644, 1);
-	tab->fourchette = sem_open("/sem_fourchette", O_CREAT, 0644, tab->nombre_de_philos);
+	tab->fourchette = sem_open("/sem_fourchette", O_CREAT, 0644,
+			tab->nombre_de_philos);
 	if (tab->afficher == SEM_FAILED || tab->verifier == SEM_FAILED
 		|| tab->fourchette == SEM_FAILED)
 	{

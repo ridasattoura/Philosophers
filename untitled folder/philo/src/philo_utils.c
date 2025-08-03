@@ -1,4 +1,22 @@
-#include "../include/philo.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   philo_utils.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: risattou <risattou@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/03 02:27:24 by risattou          #+#    #+#             */
+/*   Updated: 2025/08/03 02:43:57 by risattou         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "philo.h"
+
+void	samone_died(t_dining_table *table, int i)
+{
+	print_status(&table->philosophers[i], DIED);
+	table->someone_died = 1;
+}
 
 void	monitor_philosophers(t_dining_table *table)
 {
@@ -10,11 +28,9 @@ void	monitor_philosophers(t_dining_table *table)
 		while (!table->someone_died && ++i < table->philo_count)
 		{
 			pthread_mutex_lock(&table->check_mutex);
-			if (get_current_time() - table->philosophers[i].last_meal_time > (size_t)table->time_to_die)
-			{
-				print_status(&table->philosophers[i], DIED);
-				table->someone_died = 1;
-			}
+			if (get_current_time() - table->philosophers[i].last_meal_time 
+				> (size_t)table->time_to_die)
+				samone_died(table, i);
 			pthread_mutex_unlock(&table->check_mutex);
 			usleep(100);
 		}

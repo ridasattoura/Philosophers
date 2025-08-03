@@ -5,12 +5,12 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: risattou <risattou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/03 02:27:33 by risattou          #+#    #+#             */
-/*   Updated: 2025/08/03 02:29:56 by risattou         ###   ########.fr       */
+/*   Created: 2025/08/03 02:36:04 by risattou          #+#    #+#             */
+/*   Updated: 2025/08/03 02:36:05 by risattou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philo.h"
+#include <philo_bonus.h>
 
 int	ft_isdigit(int c)
 {

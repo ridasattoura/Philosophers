@@ -5,12 +5,12 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: risattou <risattou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/03 02:27:21 by risattou          #+#    #+#             */
-/*   Updated: 2025/08/03 02:32:55 by risattou         ###   ########.fr       */
+/*   Created: 2025/08/03 02:35:52 by risattou          #+#    #+#             */
+/*   Updated: 2025/08/03 02:36:42 by risattou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philo.h"
+#include <philo_bonus.h>
 
 static int	display_error(void)
 {
@@ -22,27 +22,22 @@ int	main(int argc, char *argv[])
 {
 	int				i;
 	t_dining_table	table;
-	pthread_t		*thread_ids;
 
 	if ((argc < 5 || argc > 6) || validate_arguments(argc, argv, &table))
 		return (display_error());
-	thread_ids = (pthread_t *)malloc(table.philo_count * sizeof(pthread_t));
 	table.start_time = get_current_time();
 	i = -1;
 	while (++i < table.philo_count)
 	{
-		if (pthread_create(&thread_ids[i], NULL, &philosopher_routine,
-				&table.philosophers[i]))
+		table.philosophers[i].process_id = fork();
+		if (table.philosophers[i].process_id == -1)
 		{
-			write(2, "Error! cannot create thread\n", 28);
-			free(table.philosophers);
-			return (free(thread_ids), 1);
+			write(2, "Error! fork failed\n", 19);
+			exit(1);
 		}
-		pthread_mutex_lock(&table.check_mutex);
-		table.philosophers[i].last_meal_time = table.start_time;
-		pthread_mutex_unlock(&table.check_mutex);
+		if (table.philosophers[i].process_id == 0)
+			philosopher_routine((void *)&table.philosophers[i]);
 	}
-	monitor_philosophers(&table);
-	cleanup_and_exit(&table, thread_ids);
+	cleanup_and_exit(&table);
 	return (0);
 }
