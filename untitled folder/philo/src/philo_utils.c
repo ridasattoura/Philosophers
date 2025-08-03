@@ -6,7 +6,7 @@
 /*   By: risattou <risattou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/03 02:27:24 by risattou          #+#    #+#             */
-/*   Updated: 2025/08/03 02:43:57 by risattou         ###   ########.fr       */
+/*   Updated: 2025/08/03 06:08:57 by risattou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,6 @@ void	monitor_philosophers(t_dining_table *table)
 		pthread_mutex_lock(&table->check_mutex);
 		dead = table->someone_died;
 		pthread_mutex_unlock(&table->check_mutex);
-		
 		while (!dead && ++i < table->philo_count)
 		{
 			pthread_mutex_lock(&table->check_mutex);
@@ -64,12 +63,10 @@ void	monitor_philosophers(t_dining_table *table)
 			satisfied = table->all_satisfied;
 		}
 		else
-		{
 			satisfied = table->all_satisfied;
-		}
 		pthread_mutex_unlock(&table->check_mutex);
 		if (satisfied)
-			break;
+			break ;
 	}
 }
 
@@ -108,7 +105,6 @@ void	precise_sleep(t_dining_table *table, size_t duration)
 		pthread_mutex_lock(&table->check_mutex);
 		dead = table->someone_died;
 		pthread_mutex_unlock(&table->check_mutex);
-		
 		if (dead || get_current_time() - start_time >= duration)
 			break ;
 		usleep(100);

@@ -6,7 +6,7 @@
 /*   By: risattou <risattou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/03 02:27:30 by risattou          #+#    #+#             */
-/*   Updated: 2025/08/03 02:29:56 by risattou         ###   ########.fr       */
+/*   Updated: 2025/08/03 06:07:55 by risattou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,10 +58,8 @@ void	*philosopher_routine(void *arg)
 		dead = table->someone_died;
 		satisfied = table->all_satisfied;
 		pthread_mutex_unlock(&table->check_mutex);
-		
 		if (dead || satisfied)
-			break;
-			
+			break ;
 		philosopher_eats(philo);
 		print_status(philo, IS_SLEEPING);
 		precise_sleep(table, table->time_to_sleep);
