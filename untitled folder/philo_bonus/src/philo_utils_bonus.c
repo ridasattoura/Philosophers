@@ -24,33 +24,40 @@ void	precise_sleep(t_table *table, long time_ms)
 {
 	long	start_time;
 
+	(void)table;
 	start_time = get_current_time();
-	while (!table->someone_died)
-	{
-		if (get_current_time() - start_time >= time_ms)
-			break ;
+	while (get_current_time() - start_time < time_ms)
 		usleep(100);
-	}
-}
-
-int	monitor_death(t_table *table)
-{
-	int		ret;
-
-	sem_wait(table->check_sem);
-	ret = table->someone_died;
-	sem_post(table->check_sem);
-	return (ret);
 }
 
 void	cleanup_and_exit(t_table *table)
 {
 	sem_close(table->print_sem);
-	sem_close(table->check_sem);
 	sem_close(table->forks_sem);
+	sem_close(table->death_sem);
 	sem_unlink("/sem_print");
-	sem_unlink("/sem_check");
 	sem_unlink("/sem_forks");
+	sem_unlink("/sem_death");
 	free(table->philos);
 	exit(0);
+}
+
+void	*monitor_death(void *arg)
+{
+	t_philo	*philo;
+	t_table	*table;
+
+	philo = (t_philo *)arg;
+	table = philo->table;
+	while (1)
+	{
+		usleep(1000);
+		if (get_current_time() - philo->last_meal_time > table->time_to_die)
+		{
+			print_status(philo, DIED);
+			sem_post(table->death_sem);
+			exit(1);
+		}
+	}
+	return (NULL);
 }

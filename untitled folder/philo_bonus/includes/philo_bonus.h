@@ -51,13 +51,11 @@ typedef struct s_table
 	int						time_to_sleep;
 	int						nb_meals;
 	int						nb_philos;
-	int						all_satisfied;
-	int						someone_died;
 	long					start_time;
 	t_philo					*philos;
 	sem_t					*print_sem;
-	sem_t					*check_sem;
 	sem_t					*forks_sem;
+	sem_t					*death_sem;
 }							t_table;
 
 int							ft_isdigit(int c);
@@ -68,10 +66,10 @@ int							ft_atoi(const char *str);
 int							validate_args(int argc, char *argv[],
 								t_table *table);
 void						print_status(t_philo *philo, int action);
-void						*philosopher_routine(void *arg);
+void						philosopher_routine(void *arg);
 void						cleanup_and_exit(t_table *table);
 long						get_current_time(void);
 void						precise_sleep(t_table *table, long time_ms);
-int							monitor_death(t_table *table);
+void						*monitor_death(void *arg);
 
 #endif

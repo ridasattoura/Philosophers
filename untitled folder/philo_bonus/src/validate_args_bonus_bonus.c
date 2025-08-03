@@ -58,8 +58,6 @@ static void	init_philosophers(t_table *table)
 {
 	int	i;
 
-	table->someone_died = 0;
-	table->all_satisfied = 0;
 	table->philos = (t_philo *)malloc(table->nb_philos * sizeof(t_philo));
 	i = -1;
 	while (++i < table->nb_philos)
@@ -80,11 +78,14 @@ static void	init_philosophers(t_table *table)
 
 static void	init_semaphores(t_table *table)
 {
+	sem_unlink("/sem_print");
+	sem_unlink("/sem_forks");
+	sem_unlink("/sem_death");
 	table->print_sem = sem_open("/sem_print", O_CREAT, 0644, 1);
-	table->check_sem = sem_open("/sem_check", O_CREAT, 0644, 1);
 	table->forks_sem = sem_open("/sem_forks", O_CREAT, 0644, table->nb_philos);
-	if (table->print_sem == SEM_FAILED || table->check_sem == SEM_FAILED
-		|| table->forks_sem == SEM_FAILED)
+	table->death_sem = sem_open("/sem_death", O_CREAT, 0644, 0);
+	if (table->print_sem == SEM_FAILED || table->forks_sem == SEM_FAILED
+		|| table->death_sem == SEM_FAILED)
 	{
 		write(2, "Error! sem_open failed\n", 23);
 		exit(1);

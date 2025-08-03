@@ -6,7 +6,7 @@ SRCS = src/main_bonus.c src/validate_args_bonus_bonus.c src/utils_bonus.c src/pu
 SRCOB = $(SRCS:.c=.o)
 HEADER = includes/philo_bonus.h
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -pthread -fsanitize=thread
+CFLAGS = -Wall -Wextra -Werror -pthread
 RM = rm -f
 
 $(NAME): $(SRCOB)

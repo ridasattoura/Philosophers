@@ -33,14 +33,10 @@ void	print_status(t_philo *philo, int action)
 
 	elapsed_time = get_current_time() - philo->table->start_time;
 	sem_wait(philo->table->print_sem);
-	sem_wait(philo->table->check_sem);
-	if (!philo->table->someone_died && !philo->table->all_satisfied)
-	{
-		printf("%ld ", elapsed_time);
-		printf("%d ", philo->id);
-		printf("%s", get_action_message(action));
-		printf("\n");
-	}
-	sem_post(philo->table->check_sem);
-	sem_post(philo->table->print_sem);
+	printf("%ld ", elapsed_time);
+	printf("%d ", philo->id);
+	printf("%s", get_action_message(action));
+	printf("\n");
+	if (action != DIED)
+		sem_post(philo->table->print_sem);
 }

@@ -25,6 +25,7 @@ int	main(int argc, char *argv[])
 
 	if ((argc < 5 || argc > 6) || validate_args(argc, argv, &table))
 		return (display_error());
+	
 	table.start_time = get_current_time();
 	i = -1;
 	while (++i < table.nb_philos)
@@ -38,6 +39,15 @@ int	main(int argc, char *argv[])
 		if (table.philos[i].process_id == 0)
 			philosopher_routine((void *)&table.philos[i]);
 	}
+	
+	// Parent process waits for death signal or child completion
+	sem_wait(table.death_sem);
+	
+	// Kill all remaining children when death is detected
+	i = -1;
+	while (++i < table.nb_philos)
+		kill(table.philos[i].process_id, SIGTERM);
+	
 	cleanup_and_exit(&table);
 	return (0);
 }
