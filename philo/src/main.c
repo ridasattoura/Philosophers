@@ -3,68 +3,46 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ader <ader@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: risattou <risattou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/20 05:24:44 by risattou          #+#    #+#             */
-/*   Updated: 2025/07/20 16:34:20 by ader             ###   ########.fr       */
+/*   Created: 2025/08/03 02:27:21 by risattou          #+#    #+#             */
+/*   Updated: 2025/08/03 02:32:55 by risattou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/philo.h"
+#include "philo.h"
 
-static int	create_threads(t_philo *philos, t_args *args)
+static int	display_error(void)
 {
-	int	i;
+	write(2, "Error! invalid arguments\n", 26);
+	return (1);
+}
 
-	i = 0;
-	while (i < args->nb_of_philo)
+int	main(int argc, char *argv[])
+{
+	int				i;
+	t_dining_table	table;
+	pthread_t		*thread_ids;
+
+	if ((argc < 5 || argc > 6) || validate_arguments(argc, argv, &table))
+		return (display_error());
+	thread_ids = (pthread_t *)malloc(table.philo_count * sizeof(pthread_t));
+	table.start_time = get_current_time();
+	i = -1;
+	while (++i < table.philo_count)
 	{
-		if (pthread_create(&philos[i].thread, NULL,
-				&start_routine, &philos[i]) != 0)
-			return (1);
-		i++;
+		if (pthread_create(&thread_ids[i], NULL, &philosopher_routine,
+				&table.philosophers[i]))
+		{
+			write(2, "Error! cannot create thread\n", 28);
+			free(table.philosophers);
+			return (free(thread_ids), 1);
+		}
+		pthread_mutex_lock(&table.check_mutex);
+		table.philosophers[i].last_meal_time = table.start_time;
+		pthread_mutex_unlock(&table.check_mutex);
 	}
-	if (pthread_create(&args->monitoring_thread, NULL,
-			&monitoring, philos) != 0)
-		return (1);
+	monitor_philosophers(&table);
+	cleanup_and_exit(&table, thread_ids);
 	return (0);
-}
-
-static void	join_threads(t_philo *philos, t_args *args)
-{
-	int	i;
-
-	i = 0;
-	while (i < args->nb_of_philo)
-	{
-		pthread_join(philos[i].thread, NULL);
-		i++;
-	}
-	pthread_join(args->monitoring_thread, NULL);
-}
-
-int	simulation(t_args *args)
-{
-	t_philo			*philos;
-	pthread_mutex_t	*forks;
-
-	if (init_philo(&philos, args, &forks) != 0)
-		return (1);
-	if (create_threads(philos, args) != 0)
-	{
-		clean_simulation(args, philos, forks);
-		return (1);
-	}
-	join_threads(philos, args);
-	clean_simulation(args, philos, forks);
-	return (0);
-}
-
-int	main(int argc, char **argv)
-{
-	t_args	args;
-
-	if (parse_arguments(argc, argv, &args) != 0)
-		return (1);
-	return (simulation(&args));
 }

@@ -3,72 +3,66 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ader <ader@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: risattou <risattou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/20 05:24:52 by risattou          #+#    #+#             */
-/*   Updated: 2025/07/20 15:38:46 by ader             ###   ########.fr       */
+/*   Created: 2025/08/03 02:27:33 by risattou          #+#    #+#             */
+/*   Updated: 2025/08/03 02:29:56 by risattou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/philo.h"
+#include "philo.h"
 
-long long	get_time_ms(void)
+int	ft_isdigit(int c)
 {
-	struct timeval	tv;
-
-	gettimeofday(&tv, NULL);
-	return ((tv.tv_sec * 1000) + (tv.tv_usec / 1000));
+	return (c >= '0' && c <= '9');
 }
 
-void	ft_usleep(int time)
+size_t	ft_strlen(const char *s)
 {
-	long long	start;
-	long long	end;
+	size_t	length;
 
-	start = get_time_ms();
-	end = start + time;
-	while (get_time_ms() < end)
-	{
-		usleep(100);
-	}
+	length = 0;
+	while (s[length])
+		length++;
+	return (length);
 }
 
-void	ft_usleep_safe(int time, t_args *args)
+int	ft_strncmp(const char *s1, const char *s2, size_t n)
 {
-	long long	start;
-	long long	end;
+	size_t	i;
 
-	start = get_time_ms();
-	end = start + time;
-	while (get_time_ms() < end)
-	{
-		if (check_if_dead(args))
-			break ;
-		usleep(100);
-	}
+	i = 0;
+	while (s1[i] && s2[i] && s1[i] == s2[i] && i < n)
+		i++;
+	if (i < n)
+		return ((unsigned char)s1[i] - (unsigned char)s2[i]);
+	else
+		return (0);
 }
 
-void	print_status(t_philo *philo, char *status)
+int	ft_atoi(const char *str)
 {
-	long long	timestamp;
+	int					idx;
+	int					sign;
+	unsigned long int	result;
 
-	pthread_mutex_lock(&philo->args->write_mutex);
-	if (!philo->args->someone_dead)
+	idx = 0;
+	sign = 1;
+	result = 0;
+	while (str[idx] == 32 || (str[idx] >= 9 && str[idx] <= 13))
+		idx++;
+	if (str[idx] == '-')
 	{
-		timestamp = get_time_ms() - philo->args->start_time;
-		printf("%lld %d %s\n", timestamp, philo->id, status);
+		sign = -1;
+		idx++;
 	}
-	pthread_mutex_unlock(&philo->args->write_mutex);
-}
-
-int	check_if_dead(t_args *args)
-{
-	pthread_mutex_lock(&args->write_mutex);
-	if (args->someone_dead)
+	else if (str[idx] == '+')
+		idx++;
+	while (ft_isdigit(str[idx]))
 	{
-		pthread_mutex_unlock(&args->write_mutex);
-		return (1);
+		result *= 10;
+		result += str[idx] - '0';
+		idx++;
 	}
-	pthread_mutex_unlock(&args->write_mutex);
-	return (0);
+	return (result * sign);
 }

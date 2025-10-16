@@ -6,7 +6,7 @@
 /*   By: risattou <risattou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/03 02:27:30 by risattou          #+#    #+#             */
-/*   Updated: 2025/08/03 06:29:03 by risattou         ###   ########.fr       */
+/*   Updated: 2025/08/03 07:08:16 by risattou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,24 @@ size_t	get_current_time(void)
 	return ((t.tv_sec * 1000) + (t.tv_usec / 1000));
 }
 
+static void	handle_single_philosopher(t_philosopher *philo)
+{
+	t_dining_table	*table ;
+
+	table = philo->table;
+	precise_sleep(table, table->time_to_die);
+	pthread_mutex_lock(&table->check_mutex);
+	if (!table->someone_died)
+	{
+		table->someone_died = 1;
+		pthread_mutex_unlock(&table->check_mutex);
+		print_status(philo, DIED);
+	}
+	else
+		pthread_mutex_unlock(&table->check_mutex);
+	pthread_mutex_unlock(&philo->fork);
+}
+
 static void	philosopher_eats(t_philosopher *philo)
 {
 	t_dining_table	*table;
@@ -46,12 +64,7 @@ static void	philosopher_eats(t_philosopher *philo)
 	print_status(philo, TOOK_FORK);
 	if (philo->table->philo_count == 1)
 	{
-		precise_sleep(table, table->time_to_die);
-		print_status(philo, DIED);
-		pthread_mutex_unlock(&philo->fork);
-		pthread_mutex_lock(&table->check_mutex);
-		table->someone_died = 1;
-		pthread_mutex_unlock(&table->check_mutex);
+		handle_single_philosopher(philo);
 		return ;
 	}
 	pthread_mutex_lock(&philo->next->fork);
@@ -65,6 +78,39 @@ static void	philosopher_eats(t_philosopher *philo)
 	pthread_mutex_unlock(&philo->fork);
 	pthread_mutex_unlock(&philo->next->fork);
 }
+// static void	philosopher_eats(t_philosopher *philo)
+// {
+// 	t_dining_table	*table;
+
+// 	table = philo->table;
+// 	pthread_mutex_lock(&philo->fork);
+// 	print_status(philo, TOOK_FORK);
+// 	if (philo->table->philo_count == 1)
+// 	{
+// 		precise_sleep(table, table->time_to_die);
+// 		pthread_mutex_lock(&table->check_mutex);
+// 		if (!table->someone_died)
+// 		{
+// 			table->someone_died = 1;
+// 			pthread_mutex_unlock(&table->check_mutex);
+// 			print_status(philo, DIED);
+// 		}
+// 		else
+// 			pthread_mutex_unlock(&table->check_mutex);
+// 		pthread_mutex_unlock(&philo->fork);
+// 		return ;
+// 	}
+// 	pthread_mutex_lock(&philo->next->fork);
+// 	print_status(philo, TOOK_FORK);
+// 	pthread_mutex_lock(&table->check_mutex);
+// 	philo->meals_eaten++;
+// 	print_status(philo, IS_EATING);
+// 	philo->last_meal_time = get_current_time();
+// 	pthread_mutex_unlock(&table->check_mutex);
+// 	precise_sleep(table, table->time_to_eat);
+// 	pthread_mutex_unlock(&philo->fork);
+// 	pthread_mutex_unlock(&philo->next->fork);
+// }
 
 void	*philosopher_routine(void *arg)
 {

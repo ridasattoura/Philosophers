@@ -6,7 +6,7 @@
 /*   By: risattou <risattou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/03 02:27:24 by risattou          #+#    #+#             */
-/*   Updated: 2025/08/03 06:30:35 by risattou         ###   ########.fr       */
+/*   Updated: 2025/08/03 07:03:27 by risattou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,10 +26,18 @@ void	check_philosopher_death(t_dining_table *table, int i, int *dead)
 	if (get_current_time() - table->philosophers[i].last_meal_time 
 		> (size_t)table->time_to_die)
 	{
-		table->someone_died = 1;
-		*dead = 1;
-		pthread_mutex_unlock(&table->check_mutex);
-		print_status(&table->philosophers[i], DIED);
+		if (!table->someone_died)
+		{
+			table->someone_died = 1;
+			*dead = 1;
+			pthread_mutex_unlock(&table->check_mutex);
+			print_status(&table->philosophers[i], DIED);
+		}
+		else
+		{
+			*dead = table->someone_died;
+			pthread_mutex_unlock(&table->check_mutex);
+		}
 	}
 	else
 	{

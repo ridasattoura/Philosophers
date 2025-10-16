@@ -6,7 +6,7 @@
 /*   By: risattou <risattou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/03 02:27:27 by risattou          #+#    #+#             */
-/*   Updated: 2025/08/03 02:29:56 by risattou         ###   ########.fr       */
+/*   Updated: 2025/08/03 06:53:58 by risattou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,8 @@ void	print_status(t_philosopher *philo, int action)
 
 	elapsed_time = get_current_time() - philo->table->start_time;
 	pthread_mutex_lock(&philo->table->print_mutex);
-	if (!philo->table->someone_died && !philo->table->all_satisfied)
+	if ((!philo->table->someone_died && !philo->table->all_satisfied)
+		|| action == DIED)
 	{
 		printf("%ld ", elapsed_time);
 		printf("%d ", philo->id);
